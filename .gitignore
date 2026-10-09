@@ -47,7 +47,10 @@ test-results/
 
 # personal reference reels — all theme HTMLs contain real people's data
 examples/reference/
-themes/**/*.html
+themes/perception/reference.html
+themes/speedrun/reference.html
+themes/prospectus/prospectus.html
+themes/ipo/ipo.html
 
 # plan docs — internal, not for the public repo
 RESUMOTION_PLAN*.md
