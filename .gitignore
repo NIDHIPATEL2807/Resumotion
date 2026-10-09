@@ -38,13 +38,23 @@ playwright-report/
 test-results/
 .playwright/
 
-# # large binaries — never commit renders or reference videos
-# *.mp4
-# *.mov
-# *.avi
-# *.webm
-# *.wav
-# reference/*.html
+# large binaries — never commit renders or reference videos
+*.mp4
+*.mov
+*.avi
+*.webm
+*.wav
+
+# personal reference reels (strip before committing)
+examples/reference/
+
+# plan docs — internal, not for the public repo
+RESUMOTION_PLAN*.md
+RESUMOTION_SKILL_PLAN.md
+
+# scratch notes
+ui.md
+theme.md
 
 # fonts bundled at build time — commit the woff2 files but not system fonts
 assets/fonts/*.ttf
