@@ -39,15 +39,15 @@ test-results/
 .playwright/
 
 # large binaries — never commit renders or reference videos
-*.mp4
-*.mov
-*.avi
-*.webm
-*.wav
+# *.mp4
+# *.mov
+# *.avi
+# *.webm
+# *.wav
 
-# personal reference reels (strip before committing)
+# personal reference reels — all theme HTMLs contain real people's data
 examples/reference/
-themes/*/reference.html
+themes/**/*.html
 
 # plan docs — internal, not for the public repo
 RESUMOTION_PLAN*.md
