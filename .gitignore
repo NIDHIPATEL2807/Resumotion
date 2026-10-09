@@ -54,3 +54,12 @@ assets/fonts/*.otf
 *.tmp
 *.temp
 frames/
+
+# planning/docs — not part of the shipped plugin
+README.md
+RESUMOTION_PLAN.md
+RESUMOTION_PLAN_V2.md
+RESUMOTION_SKILL_PLAN.md
+SKILL.md
+theme.md
+ui.md
