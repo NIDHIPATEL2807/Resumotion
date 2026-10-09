@@ -1,242 +1,405 @@
 # RESUMOTION — UI Spec
 
-Framework: Next.js 15 App Router · Tailwind CSS · No component library.
-Fonts: Syne (headings, 700/800) + JetBrains Mono (labels, code) — same as the reels.
-Palette: matches the Perception theme default. Override per-theme on theme cards.
+Framework: Next.js 15 App Router · Tailwind CSS · GSAP (hero animation) · No component library.
+Fonts: Archivo 400/600/900 (display + body) · Playfair Display Italic 400/500 (accent serif).
+Mood: quiet, crafted, bookish, gilded. Editorial warm-dark. Never loud, never SaaS.
 
+Google Fonts import:
 ```
-bg:      #0A0A0A   (near-black)
-fg:      #F5F5F5   (off-white)
-accent:  #FF6B2B   (orange)
-muted:   #3A3A3A   (dark grey, borders + labels)
+Archivo:wght@400;600;900
+Playfair+Display:ital,wght@1,400;1,500
 ```
+
+---
+
+## Color tokens
+
+```css
+--ink:         #141210   /* page background */
+--bronze:      #1C1916   /* card / panel background */
+--gild:        #26221D   /* raised surfaces, inputs, hover bg */
+--ember:       #3A332B   /* borders on hover, dividers */
+--taupe:       #9A8F7F   /* muted text, metadata, secondary display */
+--cream:       #DCC6A4   /* primary display type, wordmark, icons */
+--ivory:       #F0E7D8   /* high-emphasis small text, active states */
+--peach:       #E2A77B   /* single accent: CTA fill, focus ring */
+--line:        rgba(220,198,164,0.10)   /* default card border */
+--line-strong: rgba(220,198,164,0.22)  /* hover border, dividers */
+```
+
+Rules:
+- No pure black, no pure white, no blue or green anywhere.
+- Peach appears at most once or twice per screen — only on the primary CTA and one highlight.
+- Gradients: never on buttons. Only as faint radial glows on panel backgrounds.
+
+---
+
+## Typography rules
+
+**Display — Archivo 900**
+- Wordmark: lowercase, `clamp(72px, 12vw, 180px)`, cream, tracking -0.03em, line-height 0.95.
+- Headlines: UPPERCASE, 32–64 px, cream; de-emphasised connector words in taupe.
+- Mix Playfair italic inline for connector words:
+  `TURN YOUR RESUME` *into* `A 50-SECOND FILM` — Archivo Black caps + Playfair italic lowercase in the same line.
+
+**Accent serif — Playfair Display Italic 400/500**
+- Taglines, captions, footnotes, inline connector words.
+- Example tagline: *"your work, in motion — no. 01"*
+- Never for headings on their own. Always in contrast with Archivo Black.
+
+**Labels / meta — Archivo 600, 10–11 px, UPPERCASE, letter-spacing 0.20–0.24em, taupe**
+- Section headers, panel headers, catalog indices.
+
+**Body — Archivo 400, 14–15 px, line-height 1.6, taupe**
+- Key words and numbers in ivory for emphasis.
+
+---
+
+## Layout system
+
+- Page = bento grid of archival panels. Gap 16–20 px. Inner padding 28–40 px.
+- Panels: `background: var(--bronze)` + faint top-left glow:
+  `radial-gradient(circle at 0 0, rgba(220,198,164,0.05), transparent 60%)`
+- Border: `1px solid var(--line)`. Radius: 20–24 px.
+- No drop shadows, or a single very soft warm one: `0 2px 24px rgba(0,0,0,0.4)`.
+- Optional film-grain overlay on the page: SVG noise texture at 3–5% opacity.
+- Every panel has a header row:
+  - Left: `✦ resumotion° / section-name` — label style, taupe.
+  - Right: catalog index — `N° 01 · MMXXVI`, `I / IV`, `N° 03` — label style, taupe.
+- 1 px `var(--line)` horizontal divider between the panel header and panel content.
+
+---
+
+## Signature motifs
+
+- **✦** four-point sparkle before every section label.
+- **°** degree mark after the brand name: `resumotion°`
+- **○** small outlined circle beside the wordmark in the nav.
+- Roman numerals + `N°` catalog numbering throughout.
+- Year ranges: `2024 — '26`.
+- Giant outlined numerals behind panels at low opacity (`cream`, ~8% opacity, Archivo 900).
+- Separators with middle dots: `PASTE RESUME · CLAUDE WRITES · ENGINE RENDERS · YOU GET AN MP4`.
+- Mixed-weight sentences everywhere: Archivo Black caps + Playfair italic lowercase in one line.
 
 ---
 
 ## Page structure
 
 ```
-/               home (all sections)
+/               home (all sections, one scroll)
 /gallery        full gallery grid
 ```
-
-Everything lives on one scroll. `/gallery` is an overflow page once the gallery grows past ~12 entries.
 
 ---
 
 ## 1. NavBar
 
-Fixed top. Transparent until 80 px scroll, then `bg-[#0A0A0A]/90 backdrop-blur`.
+Fixed top. Transparent until 60 px scroll, then `background: rgba(20,18,16,0.92); backdrop-filter: blur(12px)`.
 
 ```
-[resumotion]              [Themes]  [Gallery]  [Install ↓]
- ↑ Syne 700, accent        ↑ Syne 500, fg/60
+resumotion° ○          ✦ THEMES   ✦ GALLERY   INSTALL ↓
+  ↑ Archivo 900                    ↑ Archivo 600, 10px, taupe, tracked
+    cream, 22px
 ```
 
-- Logo is wordmark only, no icon.
-- "Install ↓" is an anchor link to the Install section. On mobile, collapse Themes + Gallery into a hamburger.
-- No border. The blur is the separator.
+- No border on the nav itself. The blur is the separator.
+- Active link: ivory + `•` before it.
+- `INSTALL ↓` is a peach-fill pill: height 28 px, radius 999 px, Archivo 600 10 px ink text.
+- On mobile (< 768 px): hamburger icon (3 lines, cream), slides in a full-height drawer with the same warm-dark bg.
 
 ---
 
 ## 2. Hero
 
-Full viewport height. Splits 50/50 on desktop, stacks on mobile (reel on top, text below).
+Full viewport height. Two-column split on desktop (text left, animation right). Stacks on mobile (animation top, text below).
 
-**Left — text**
+### Left — text
 
 ```
-Your resume,
-as a 50-second film.
-
-[▶ Install plugin]   [See reels ↓]
+TURN YOUR RESUME
+into A 50-SECOND
+FILM.
 ```
 
-- "Your resume," in Syne 800, ~72 px desktop / 40 px mobile, fg.
-- "as a 50-second film." same size, accent colour.
-- Subline below: `Free · Open source · Runs in Claude Code` in JetBrains Mono, muted, 14 px.
-- Two buttons: "Install plugin" is solid accent bg, "See reels" is ghost (accent border, transparent bg).
-- Buttons are 48 px tall, rounded-none (sharp corners match the reel aesthetic).
+- "TURN YOUR RESUME" — Archivo 900, ~72 px, cream, UPPERCASE.
+- "into" — Playfair Display Italic, same size, taupe (inline serif drop).
+- "A 50-SECOND" — Archivo 900, cream.
+- "FILM." — Archivo 900, peach.
+- Below, in Playfair italic, taupe, 18 px: *"beat-synced · synthesized sound · open source"*
+- Two buttons, 40 px tall, radius 999 px:
+  - Primary: peach fill, ink text, Archivo 600 10 px tracked — `INSTALL PLUGIN`
+  - Ghost: `var(--line-strong)` border, transparent fill, cream text — `SEE REELS ↓`
 
-**Right — live reel**
+### Right — isometric hero animation
 
-- `<HeroReel />` client component. Loads the engine with `dynamic(() => import('../components/HeroReel'), { ssr: false })`.
-- Canvas is 16:9, max-width 640 px on desktop, full-width on mobile.
-- Muted by default. Floating button bottom-right of the canvas: `▶ sound on` → `■ sound off`. JetBrains Mono, 12 px, accent text, accent border, transparent bg.
-- MP4 fallback (`<video autoPlay muted loop playsInline>`) if the engine fails to load or the device is low-power.
-- Thin 1 px accent border around the canvas. No drop shadow — that would soften it.
+This is the centrepiece. A 3D isometric scene built in CSS + GSAP, running at 60 fps, no canvas, no WebGL.
+
+**The scene: a floating isometric workstation**
+
+Three objects arranged on an isometric grid, each floating independently:
+
+```
+        ┌──────────────────┐
+        │  PLUGIN BLOCK    │   ← a tall isometric block, like a keycap or plugin card
+        │  resumotion°     │     with the wordmark on its face
+        └──────────────────┘
+               ↑
+        ┌──────────────────┐
+        │  TERMINAL BLOCK  │   ← a flat isometric screen showing:
+        │  > /resumotion   │     the slash command being typed, letter by letter
+        │  > loading…      │
+        └──────────────────┘
+               ↑
+        ┌──────────────────┐
+        │  REEL BLOCK      │   ← a small film-strip or card showing
+        │  ▶ reel.mp4      │     a single frame still from a reel
+        └──────────────────┘
+```
+
+The three blocks float gently (independent sine-wave y-offsets, different phases). When the animation sequence plays:
+
+1. **TERMINAL BLOCK** appears first. The cursor blinks. `/resumotion` types out letter by letter (GSAP `TextPlugin`, ~1.2 s).
+2. A loading bar fills across the bottom of the terminal block (1 s).
+3. **PLUGIN BLOCK** rises into frame from below, the `resumotion°` wordmark fades in on its face.
+4. **REEL BLOCK** slides in from the right, showing the reel frame.
+5. All three settle into their floating idle positions. Loop back to step 1 after ~6 s pause.
+
+**Implementation**
+
+```
+components/
+  HeroScene.tsx        ← GSAP + CSS isometric, dynamic import (no SSR)
+  IsoBlock.tsx         ← reusable isometric block (top face, left face, right face as divs)
+```
+
+- Isometric projection via CSS `transform: rotateX(60deg) rotateZ(-45deg)` on a wrapper, individual faces as absolutely positioned divs.
+- Face colours: top = `var(--gild)`, left = `var(--bronze)`, right = `var(--ink)` with a 1 px `var(--line)` edge.
+- Text on block faces: Archivo 900 for the wordmark, JetBrains Mono for the terminal text (keeps the terminal block on-brand with the reel aesthetic).
+- GSAP `gsap.timeline()` drives the sequence. `gsap.ticker` keeps it at 60 fps.
+- Floating idle: `gsap.to(block, { y: -8, repeat: -1, yoyo: true, ease: "sine.inOut", duration: 2.4, delay: i * 0.6 })` — different delay per block.
+- On mobile: scale the scene to 70%, or replace with an MP4 fallback of the animation.
+- Reduced-motion: `@media (prefers-reduced-motion)` → freeze all animations, show static isometric scene.
+
+**Surrounding atmosphere**
+
+- Faint radial glow behind the scene: `radial-gradient(ellipse at center, rgba(226,167,123,0.06), transparent 70%)`.
+- Film grain overlay at 4% opacity over the whole hero.
+- Giant `N° 01` in Archivo 900, cream, 8% opacity, behind the scene — the catalog motif.
 
 ---
 
 ## 3. How it works
 
-4-step horizontal strip. On mobile, vertical list.
+Section header: `✦ PROCESS · N° 02` — label style, taupe.
 
-Each step: a number in accent (Syne 800, 48 px), a short label (Syne 700, 18 px, fg), and a one-line description (JetBrains Mono, 13 px, fg/60).
+4-step horizontal strip on desktop, vertical list on mobile.
+
+Each step is a mini archival panel:
 
 ```
-  01              02                03               04
-  Give resume     Claude writes     Engine renders   You get an MP4
-  ─────────────   ───────────────   ──────────────   ────────────
-  Paste text or   Facts → script.   Beat-synced      16:9 + 9:16,
-  drop a PDF.     json in seconds.  canvas + audio.  ready to post.
+┌──────────────────────────────┐
+│  ✦ STEP / N° 01              │  ← label, taupe
+├──────────────────────────────┤
+│                              │
+│  01                          │  ← Archivo 900, 48px, cream
+│  Give resume                 │  ← Archivo 900, 20px, cream
+│                              │
+│  Paste text or drop a PDF.   │  ← Archivo 400, 14px, taupe
+│  Only real facts extracted.  │
+└──────────────────────────────┘
 ```
 
-No icons. The numbers are the visual. A thin accent horizontal rule connects them on desktop.
+Steps:
+1. **Give resume** — paste text or drop a PDF. Only real facts extracted.
+2. **Claude writes the script** — facts.json → script.json in seconds. You review and approve.
+3. **Engine renders** — beat-synced canvas + synthesized audio. No AI in this step.
+4. **You get an MP4** — 16:9 + 9:16, ready to post.
+
+A thin 1 px `var(--line)` horizontal rule connects the step numbers on desktop. The connector text in Playfair italic: *"then"* between each step.
 
 ---
 
 ## 4. Themes
 
-Section header: `THEMES` in JetBrains Mono, 11 px, letter-spacing 0.2 em, muted. Left-aligned.
+Section header: `✦ THEMES · N° 03 · I / III` — label style, taupe.
 
-Three cards, horizontal scroll on mobile. Each card:
+Three archival panels in a row. Each:
 
 ```
-┌─────────────────────────────────────┐
-│                                     │
-│   [looping 6 s video clip]          │
-│                                     │
-├─────────────────────────────────────┤
-│  PERCEPTION                         │  ← Syne 700, 20 px, fg
-│  ML / CV / AI engineers             │  ← JetBrains Mono, 13 px, fg/60
-│                                     │
-│  120 BPM · D minor · dark           │  ← JetBrains Mono, 12 px, muted
-└─────────────────────────────────────┘
+┌──────────────────────────────────────────┐
+│  ✦ THEME / N° 01                         │  ← label, taupe
+├──────────────────────────────────────────┤
+│                                          │
+│  [looping 6 s video clip, warm poster]   │
+│                                          │
+├──────────────────────────────────────────┤
+│                                          │
+│  PERCEPTION                              │  ← Archivo 900, 24px, cream
+│  *for ML, CV & AI engineers*             │  ← Playfair italic, 15px, taupe
+│                                          │
+│  120 BPM · D minor · dark                │  ← label, taupe
+└──────────────────────────────────────────┘
 ```
 
-- Card bg: `#111` (one step lighter than page bg). 1 px muted border.
-- On hover: border switches to accent. No scale, no shadow — hard swap only.
-- Video: `autoPlay muted loop playsInline`, `preload="none"`, poster image set. Lazy-loaded.
-- Card is not a link. No CTA inside the card. The Install section below covers the action.
+- Hover: `border-color` transitions to `var(--line-strong)`, background to `var(--gild)`. 300 ms ease-out.
+- Video: `autoPlay muted loop playsInline preload="none"` with poster. Lazy-loaded.
+- Card is not a link. No CTA inside.
 
 ---
 
 ## 5. Gallery
 
-Section header same style as Themes.
+Section header: `✦ REELS · N° 04` — label style, taupe.
 
-Masonry-ish grid, 3 columns desktop / 2 tablet / 1 mobile. Each card:
+Masonry grid, 3 col desktop / 2 col tablet / 1 col mobile, gap 16 px.
+
+Each card:
 
 ```
-┌────────────────────┐
-│  [video thumbnail] │  ← static poster image, plays on hover
-│                    │
-├────────────────────┤
-│  Priya Sharma      │  ← Syne 600, 15 px, fg
-│  ML Engineer       │  ← JetBrains Mono, 12 px, fg/60
-│  perception theme  │  ← JetBrains Mono, 11 px, accent
-└────────────────────┘
+┌────────────────────────────────┐
+│  ✦ REEL / N° 07                │  ← label, taupe
+├────────────────────────────────┤
+│                                │
+│  [poster image — plays on      │
+│   hover, muted loop]           │
+│                                │
+├────────────────────────────────┤
+│  Priya Sharma                  │  ← Archivo 900, 16px, cream
+│  *ML Engineer*                 │  ← Playfair italic, 13px, taupe
+│  PERCEPTION THEME →            │  ← label, peach, links to their post
+└────────────────────────────────┘
 ```
 
-- Clicking the card opens the person's post (X, LinkedIn, etc.) in a new tab.
-- Bottom of section: `[→ See all reels]` link to `/gallery` once count > 6.
-- If gallery is empty: placeholder card saying "Be the first. Share your reel →" linking to the GitHub issue template.
+- Click opens the person's X / LinkedIn post in a new tab.
+- Empty state: one panel saying `*"be the first — share your reel →"*` in Playfair italic, cream, linking to the GitHub issue template.
+- `[→ See all reels]` anchor link to `/gallery` once count > 8.
 
 ---
 
 ## 6. Install
 
-Two columns on desktop, stacked on mobile.
+Section header: `✦ INSTALL · N° 05` — label style, taupe.
 
-**Left — Claude Code plugin**
+Two archival panels side by side.
+
+**Panel left — Claude Code plugin**
 
 ```
-CLAUDE CODE PLUGIN
-─────────────────────────────────────
+✦ CLAUDE CODE / N° 01                    I / II
+─────────────────────────────────────────────────
 Requires Node 20+ and ffmpeg.
 
-  $ /plugin install resumotion        ← code block, JetBrains Mono
-                                         accent text, #111 bg, 1 px muted border
+  $ /plugin install resumotion
 
-[Copy]  ← small button, top-right of block
+                                          [COPY ↗]
 ```
 
-**Right — claude.ai skill**
+- Code block: JetBrains Mono, 14 px, ivory text, `var(--ink)` bg, 1 px `var(--line)` border, radius 8 px.
+- `[COPY ↗]` is a ghost pill, top-right of code block.
+
+**Panel right — claude.ai skill**
 
 ```
-CLAUDE.AI SKILL
-─────────────────────────────────────
-Upload the skill zip in claude.ai settings.
+✦ CLAUDE.AI / N° 02                      II / II
+─────────────────────────────────────────────────
 No Node or ffmpeg required.
 Render runs in the claude.ai sandbox.
 
-  [↓ Download skill.zip]              ← accent ghost button
+  [↓ DOWNLOAD SKILL.ZIP]
 ```
 
-Below both columns, one line in JetBrains Mono, 12 px, fg/60:
-`Rendering runs on your machine. Your resume is only shared with Claude as part of your conversation.`
+- Download button: peach fill, ink text, Archivo 600 10 px, radius 999 px, height 32 px.
+
+Below both panels, in Playfair italic, taupe, 13 px, centered:
+*"Rendering runs on your machine. Your resume is only shared with Claude as part of your conversation."*
 
 ---
 
 ## 7. Privacy
 
-Not a full section — a single card, dark bg, 1 px accent border.
+Not a section — a single slim archival panel, 1 px `var(--line-strong)` border.
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│  Your data stays yours.                                       │
-│                                                               │
-│  Rendering runs on your machine. Your resume is only shared  │
-│  with Claude as part of your normal conversation — the same   │
-│  as any other message you send. We don't log it, store it,   │
-│  or send it anywhere else. No accounts, no server.           │
-└──────────────────────────────────────────────────────────────┘
+✦ YOUR DATA · N° 06
+─────────────────────────────────────────────────────────
+Your work stays yours.
+
+Rendering runs on your machine. Your resume is only shared
+with Claude as part of your conversation — the same as any
+other message you send. No accounts. No server. No logs.
 ```
 
-Syne 700 for the heading, JetBrains Mono 13 px for the body.
+Heading Archivo 900 20 px cream. Body Archivo 400 14 px taupe, "No accounts. No server. No logs." in ivory.
 
 ---
 
 ## 8. Make a theme
 
-Small section, left-aligned.
+Section header: `✦ CONTRIBUTE · N° 07` — label style, taupe.
+
+Small panel, left-aligned text.
 
 ```
-MAKE A THEME
-────────────────────────────────
-Copy _template/, write scenes + score.js,
-open a PR. We'll credit you here.
+ADD A THEME                               N° 08
+*and your name goes here*
+─────────────────────────────────────────────────
+Copy themes/_template/, write scenes + score.js,
+open a PR. We review against the quality bar.
 
-[→ CONTRIBUTING.md]
+  CONTRIBUTING.md →
 ```
 
-If there are community contributors: a row of GitHub avatars below, each linking to their PR.
+If contributors exist: a row of their GitHub avatars below, each 32 px circle, cream border 1 px, linking to their PR. Label under the row: `COMMUNITY · N° <count> THEMES`.
 
 ---
 
 ## 9. Footer
 
-Single row. No columns.
-
 ```
-resumotion · MIT · made by Nidhi Patel    [GitHub]  [X]  [LinkedIn]
+resumotion° · MIT · *made by Nidhi Patel*    — 2024 · '26
+
+✦ GitHub   ✦ X   ✦ LinkedIn
 ```
 
-JetBrains Mono, 12 px, fg/40. Links are icon-only (SVG, 18 px, fg/60 → fg on hover).
-No border, no background — the page just ends.
+- Wordmark: Archivo 900, 14 px, cream.
+- "made by Nidhi Patel": Playfair italic, taupe.
+- "2024 · '26": label style, taupe.
+- Social links: icon-only SVGs, 18 px, taupe → cream on hover, 300 ms ease.
+- No background, no border — the page just ends. One thin `var(--line)` rule above.
+
+---
+
+## Motion rules
+
+- **Hero animation (GSAP):** 60 fps, smooth. Sequence on load, then idle float loop.
+- **Everything else:** 300–500 ms ease-out. Fades and 8 px y-rises only on scroll-enter.
+- **Hover:** border color to `var(--line-strong)`, bg to `var(--gild)`. No scale, no glow, no bounce.
+- **Reduced motion:** `prefers-reduced-motion: reduce` → all animations frozen. Hero shows static isometric scene.
+- **No spinning, no neon pulses, no gradient sweeps.** Silence and stillness are the aesthetic.
+
+Scroll-enter animations: `gsap.from(el, { opacity: 0, y: 8, duration: 0.5, ease: "power2.out" })` triggered by `IntersectionObserver`. One pass only — don't re-animate on scroll-up.
 
 ---
 
 ## Interaction rules
 
-- **No animations on load.** The reel is already moving. Everything else is static until interacted with.
-- **Hover states are instant** (no transitions) to match the hard-cut aesthetic of the reels.
-- **One accent colour.** Never use accent for decorative purposes — only for things the user should look at or click.
-- **No gradients.** Flat colour only.
-- **No rounded corners** except 2 px on buttons (barely there). Cards are square.
-- **Type scale:** Syne for everything that matters, JetBrains Mono for everything that describes or labels.
+- **Peach once or twice per screen.** Only on the primary CTA and one small highlight. Not on hover states, not on decorative elements.
+- **No gradients on interactive elements.** Flat colour fills only.
+- **No rounded corners below radius 20 px on panels.** Pills (radius 999) on buttons only.
+- **Type does the work.** Don't add icons where a word works better. The ✦ sparkle is structural, not decoration.
+- Links: `"See full process →"` style — small, arrow suffix, underline on hover only.
 
 ---
 
 ## Mobile (< 768 px)
 
-- Hero: reel on top (full width), text below.
-- How it works: vertical numbered list.
-- Themes: horizontal scroll, cards 80 vw.
+- Hero: isometric animation on top (scaled to 70%), text below.
+- How it works: vertical numbered list, full-width panels.
+- Themes: horizontal scroll snap, cards 85 vw.
 - Gallery: 1 column.
 - Install: stacked, full width.
-- NavBar: hamburger for Themes + Gallery links.
+- NavBar: hamburger → full-height warm-dark drawer.
+- Film grain overlay stays.
 
 ---
 
@@ -245,26 +408,27 @@ No border, no background — the page just ends.
 ```tsx
 // app/layout.tsx
 export const metadata = {
-  title: "Resumotion — your resume as a 50-second film",
+  title: "resumotion° — your resume as a 50-second film",
   description: "Free Claude plugin. Paste your resume, get a beat-synced MP4. Open source.",
   openGraph: {
-    images: ["/og-image.jpg"],   // 1200×630, shows the hero reel as a still
+    images: ["/og-image.jpg"],     // 1200×630, a single designed still from a reel
     videos: ["/clips/og-reel.mp4"],
   },
   twitter: { card: "summary_large_image" },
 }
 ```
 
-`og-image.jpg` is a single designed frame from the Nidhi reel — not a screenshot of the page.
+`og-image.jpg` is a single frame from the Nidhi reel — warm, designed, on-brand — not a screenshot of the page.
 
 ---
 
 ## Analytics
 
-Umami or Plausible script tag in `layout.tsx`, self-hosted or free tier. Track:
+Umami or Plausible in `layout.tsx`, self-hosted or free tier. Track:
 - Page views
-- "Install plugin" button clicks
-- "Download skill.zip" button clicks
+- `INSTALL PLUGIN` clicks
+- `DOWNLOAD SKILL.ZIP` clicks
 - Gallery card clicks
+- `CONTRIBUTING.md →` clicks
 
 No cookies. One `<Script strategy="afterInteractive">` tag. Nothing else.
