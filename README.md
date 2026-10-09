@@ -6,53 +6,80 @@ A Claude skill. Works in claude.ai and Claude Code. No timeline software, no Aft
 
 ---
 
+<!-- drop reel-readme.gif here once export-readme.js is built -->
+<!-- ![resumotion demo](out/reel-readme.gif) -->
+
+---
+
+## examples
+
+Three reels, three completely different films — same skill, different people.
+
+### Perception — ML / CV / AI engineers
+> detector boxes, depth maps, beat-synced impacts, dark orange palette
+
+<!-- ![Perception theme](gallery/perception-preview.gif) -->
+*preview coming — [see reference reel](themes/perception/) · dark background · Syne + JetBrains Mono · 120 BPM D minor*
+
+---
+
+### Speedrun — game devs / hackers / fast builders
+> dino mascot, pixel energy, rapid cuts, neon on black
+
+<!-- ![Speedrun theme](gallery/speedrun-preview.gif) -->
+*preview coming — [see reference reel](themes/speedrun/) · black + neon · pixelated type · high BPM*
+
+---
+
+### Prospectus — finance / consulting / MBA
+> career as a rising chart, annotated milestones, restrained and premium
+
+<!-- ![Prospectus theme](gallery/prospectus-preview.gif) -->
+*preview coming · navy + gold · IBM Plex Sans · ~105 BPM soft piano*
+
+---
+
 ## what it makes
 
-A 40–60 second MP4 reel — your name, your work, your stack — animated to music. The kind of thing you post on LinkedIn and people screenshot.
+A 30–50 second MP4 reel — your name, your work, your stack — animated to music you didn't have to compose. The kind of thing you post on LinkedIn and people screenshot.
 
-[example: Nidhi Patel reel →](examples/nidhi/)
+Every reel is written fresh for the person. Two resumes in the same theme look clearly different.
 
 ---
 
 ## how it works
 
-You paste your resume. Claude asks you two questions max. You approve a screenplay. You approve three preview frames. You get an MP4.
-
 ```
-you: paste resume
-claude: asks ≤2 questions ("one word for your work style?")
-claude: writes screenplay → you approve
-claude: renders 3 preview frames → you approve  
-claude: renders full MP4 + social cut (1280×720)
+you:   paste resume
+claude: ≤2 questions ("one word for your work style?")
+claude: writes screenplay → you approve (Gate 1)
+claude: renders 3 preview frames per scene → you approve (Gate 2)
+claude: renders full MP4 + social cut + README GIF
 ```
 
-That's it.
+That's it. You never touch a timeline or a canvas.
 
 ---
 
-## using it in claude.ai (no setup)
+## install — claude.ai (no setup)
 
-1. Open [claude.ai](https://claude.ai)
-2. Add this skill to your project
-3. Start a new conversation, paste your resume
-4. Claude does the rest — the reel plays in your browser and you click **Download video**
+1. Download `resumotion.zip` from [Releases](../../releases)
+2. Go to Claude → Settings → Skills → upload the zip
+3. New conversation → attach your resume → "make my resume into a video"
+4. Claude does the rest — the reel plays in your browser, click **Download video**
 
-The browser records the canvas + audio directly. No installs needed. Works on Chrome and Edge. The downloaded file is WebM (plays everywhere).
+Works on Chrome and Edge. Downloaded file is WebM (plays everywhere). Code execution must be on.
 
 ---
 
-## using it in Claude Code (best quality)
-
-Claude Code renders frame-by-frame via Playwright and encodes with ffmpeg. You get a proper H.264 MP4, a social cut at 1280×720, and a framesheet.
-
-**one-time setup:**
+## install — Claude Code (best quality, full MP4)
 
 ```bash
-# 1. clone the repo
-git clone https://github.com/nidhipatel/resumotion
-cd resumotion
+# 1. clone into your skills folder
+git clone https://github.com/NIDHIPATEL2807/Resumotion ~/.claude/skills/resumotion
+cd ~/.claude/skills/resumotion
 
-# 2. install dependencies
+# 2. install node dependencies
 npm install
 npx playwright install chromium
 
@@ -60,114 +87,88 @@ npx playwright install chromium
 # mac:     brew install ffmpeg
 # windows: winget install ffmpeg
 # linux:   sudo apt install ffmpeg
-
-# 4. check everything works
-node scripts/check-deps.js
 ```
 
-**then just talk to Claude:**
+Then in any folder with your resume:
 
 ```
-/resumotion  →  paste your resume when asked
+claude
+> turn my resume into a reel
 ```
 
-Output lands in `out/`:
+Output in `out/`:
 - `reel-yourname-16x9.mp4` — master (CRF 20)
 - `reel-yourname-16x9-social.mp4` — 1280×720 for LinkedIn/Instagram
-- `reel-yourname-16x9-framesheet.jpg` — contact sheet of key frames
+- `reel-yourname-16x9-framesheet.jpg` — contact sheet of every second
+- `reel-readme.gif` — silent loop for your GitHub profile README
 
 ---
 
 ## personalization
 
-Claude tailors every reel to the person. Things that change:
+Claude tailors every reel to the person. Things you can specify:
 
 | what | how |
-|------|-----|
-| name animation | letter positions, slam timing, line breaks |
-| color accent | you can specify any hex — default is `#FF6B2B` orange |
-| work style word | "precise" → tighter, cooler palette; "bold" → bigger type, more impact |
-| scene selection | Claude picks which scenes to include based on your resume |
-| scan box seed | name-hashed so your grain/jitter pattern is unique to you |
-| mascot | optional — add your own character image (see below) |
-| brand logo | optional — shown in the opener and outro |
+|---|---|
+| feel | "one word: precise / bold / calm / playful" → maps to speed + music energy |
+| accent color | any hex, or describe it — default is theme's approved palette |
+| mascot / nickname | "nino.model", a dino, a handle — shows in the opener and outro |
+| logo | attach a PNG — Claude tints it to match your palette |
+| "open to" roles | shows in the outro CTA |
+| density | punchy (default, ≤6 words per beat) or detailed |
 
-Two resumes in the same theme will always look clearly different.
-
----
-
-## adding your mascot / logo (optional)
-
-Drop files in `assets/`:
-
-```
-assets/
-  mascot.png     ← your character (transparent PNG, ~280px tall)
-  logo.png       ← your logo (transparent PNG)
-  brand-color.txt ← one line: #FF6B2B
-```
-
-Claude detects them automatically and includes them in:
-- opener scene (mascot rises in, gets a detector box)
-- outro scene (mascot waves goodbye)
-- name slam scene (logo top-right)
-
-If no mascot is provided, the opener uses a clean boot sequence instead.
+If you don't specify anything, Claude picks sensible defaults from your resume.
 
 ---
 
 ## the two gates
 
-Claude will not render the full MP4 without your approval at two checkpoints.
-
 **Gate 1 — screenplay**
-Claude writes a scene-by-scene screenplay in plain English before touching any canvas. You read it, say "looks good" or ask for changes. Nothing renders until you approve.
+Claude writes a scene-by-scene screenplay in plain English before touching any canvas. Every scene, every word, every time range. You edit in plain language ("make the stats section slower", "change 'engineer' to 'builder'"). Nothing renders until you say go.
 
 **Gate 2 — preview frames**
-Three stills (beginning / middle / settled) per scene render first. You review them, flag anything off. Full render only after you say go.
+Three stills (start / mid / settled) per scene render first. You review the contact sheet, flag anything off. Full render only after you approve.
 
-This stops you from waiting 3 minutes for a render only to find the name is spelled wrong.
+This catches layout problems in seconds, not minutes.
 
 ---
 
 ## themes
 
-**Perception** (v1, included)
-Dark background, orange accent, detector boxes, depth-map scanner, beat-synced impacts. Built for ML / CV / AI / robotics engineers. Works for anyone.
+| Theme | For | Look | Sound |
+|---|---|---|---|
+| **Perception** ✅ | ML / CV / AI / robotics | Detector boxes, depth maps, scanner wipes | D minor, 120 BPM, drone → drop |
+| **Speedrun** ✅ | Game devs, hackers, fast builders | Dino mascot, pixel energy, rapid cuts | High BPM, chiptune energy |
+| **Prospectus** 🔜 | Finance, IB, consulting, MBA | Career chart, annotated milestones | Soft piano, ~105 BPM |
+| **General** 🔜 | Anyone else (electrical, teaching, ops…) | Clean bold type, no domain metaphors | Neutral electronic |
 
-More themes coming. If you want to build one: copy `themes/perception/`, edit `theme.json` and the scene files. Each scene is a single `render(ctx, localT, data, script, theme, frame)` function — no framework to learn.
+Each theme is a `THEME.md` brief + a reference HTML. Claude reads the brief and writes a bespoke HTML per person — same theme, different film every time.
 
----
-
-## what Claude writes (and what it doesn't touch)
-
-Claude writes `script.json` — the screenplay: scene order, text content, timing in beats, variant choices. It never touches the rendering engine. The engine is deterministic: same script always produces the same frames.
-
-This means you can version-control your reel. Commit `script.json`, re-render any time, get pixel-identical output.
+Want to build a theme? Copy `themes/_template/THEME.md` and fill it in.
 
 ---
 
 ## privacy
 
-Your resume text is sent to Claude's API as part of the conversation. It is not stored in this repo. The rendered MP4 is generated entirely on your machine (Claude Code) or in your browser (claude.ai). Nothing is uploaded.
+Your resume text goes to Claude's API as part of your conversation — same as any other message you send Claude. The rendered video is generated on your machine (Claude Code) or in your browser (claude.ai). Nothing is uploaded to a server.
 
-If your resume contains confidential project names or unreleased products, Claude will ask before including them and suggest redactions.
+If your resume contains confidential project names or unreleased products, Claude will flag them and ask before including anything sensitive.
 
 ---
 
 ## quality checks (automatic)
 
-Before the final render, Claude runs:
+Every render runs these. Each returns **pass**, **fixed**, or **n/a** — nothing is silently skipped.
 
-| check | target |
-|-------|--------|
-| words ÷ 3 + 1s ≤ scene duration | no rushed text |
-| all text inside 5% safe area | nothing cropped on mobile |
-| contrast ratio ≥ 4.5:1 | readable on any screen |
-| loudness -14 LUFS ±1 | sounds right on phone speakers |
-| A/V sync within 2 frames | audio hits land on time |
-
-Anything that fails gets flagged with a fix, not silently skipped.
+| check | rule |
+|---|---|
+| text duration | ≥ words ÷ 3 + 1 s per block |
+| safe area | all text ≥ 5% inside every edge |
+| contrast | ≥ 4.5:1 at worst frame |
+| loudness | −14 LUFS ±1, true peak ≤ −1 dBTP |
+| A/V sync | each hit within 2 frames of its sound |
+| text overflow | zero — measured with real fonts |
+| flash rate | ≤ 3 full-screen flashes/second |
 
 ---
 
@@ -175,40 +176,28 @@ Anything that fails gets flagged with a fix, not silently skipped.
 
 ```
 resumotion/
-  SKILL.md              ← Claude reads this (the skill instructions)
-  README.md             ← you are here
-  package.json
-  engine/               ← deterministic render engine (JS)
-    timeline.js         ← beat clock, single source of truth for timing
-    easing.js
-    prng.js             ← seeded randomness (mulberry32)
-    fx.js               ← text, boxes, grain, shake
-    audio/
-      synth.js
-      mixer.js
-  themes/
-    perception/
-      theme.json
-      score.js          ← the music
-      scenes/           ← one file per scene type
-        opener.js
-        name_slam.js
-        thesis.js
-        case_study.js
-        project.js
-        wins_grid.js
-        stack_flash.js
-        outro.js
-  scripts/
-    build-preview.js    ← script.json → standalone preview.html
-    render.js           ← preview.html → MP4 via Playwright + ffmpeg
-    validate.js         ← quality checks
-    check-deps.js       ← node / ffmpeg / playwright check
-  examples/
-    nidhi/
-      script.json       ← example screenplay
-  assets/
-    fonts/              ← Syne + JetBrains Mono woff2 (bundled, no network needed)
+├── SKILL.md                  ← Claude reads this (the workflow)
+├── references/               ← Claude reads these too
+│   ├── discovery.md          ← facts extraction + personalization menu
+│   ├── story.md              ← what to showcase, scene order, length
+│   ├── quality-bar.md        ← all quality checks
+│   ├── craft.md              ← technical lessons (fonts, globalAlpha, etc.)
+│   └── themes.md             ← which theme fits which person
+├── themes/
+│   ├── _template/THEME.md    ← starter for new themes
+│   ├── perception/THEME.md   ← ML/CV/AI theme brief
+│   ├── speedrun/THEME.md     ← game dev / hacker theme brief
+│   └── prospectus/THEME.md   ← finance / consulting theme brief
+├── toolkit/
+│   ├── helpers.js            ← easing, text helpers, font preload, seek API
+│   ├── render.js             ← Playwright + ffmpeg → MP4 (chunked)
+│   ├── stills.js             ← preview frames → contact sheet
+│   ├── check-audio.js        ← LUFS + peaks + silence check
+│   ├── export-captions.js    ← script → reel.srt
+│   ├── export-readme.js      ← silent GIF loop for GitHub profile
+│   └── fonts/                ← Syne + JetBrains Mono woff2 (bundled)
+├── examples/                 ← fake people: facts.json + script.md
+└── gallery/                  ← links to real reels (no video files committed)
 ```
 
 ---
@@ -216,19 +205,19 @@ resumotion/
 ## faq
 
 **does it work for non-engineers?**
-Yes. The Perception theme works for anyone. The scene selection adapts to what's in your resume — a designer gets different scenes than a backend engineer.
+Yes — pick the right theme. Speedrun for game devs. Prospectus for finance. General (coming) for everyone else.
 
 **can i edit the MP4 after?**
-Yes, it's a standard H.264 file. Drop it in Premiere, DaVinci, CapCut, whatever.
+Yes, it's standard H.264. Drop it in Premiere, DaVinci, CapCut, whatever.
 
-**can i change the music?**
-Edit `themes/perception/score.js`. Every instrument and timing is in there. BPM is set in `theme.json`.
-
-**can i do 9:16 (vertical / reels format)?**
+**can i do 9:16 (vertical / reels)?**
 Not in v0. On the roadmap.
 
 **i found a bug / the reel looks wrong**
-Open an issue with your `script.json` (redact anything sensitive) and the framesheet. That's enough to reproduce it.
+Open an issue with your screenplay (redact anything sensitive) and the framesheet. That's enough to reproduce it.
+
+**can i build my own theme?**
+Yes — copy `themes/_template/THEME.md`, fill it in, open a PR.
 
 ---
 
