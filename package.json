@@ -1,0 +1,21 @@
+{
+  "name": "resumotion",
+  "version": "0.1.0",
+  "description": "Turn a resume into a beat-synced motion reel",
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate.js",
+    "preview": "node scripts/build-preview.js",
+    "render": "node scripts/render.js",
+    "check-audio": "node scripts/check-audio.js",
+    "check-deps": "node scripts/check-deps.js"
+  },
+  "dependencies": {
+    "playwright": "^1.48.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

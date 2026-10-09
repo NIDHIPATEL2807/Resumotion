@@ -53,25 +53,33 @@ resume.pdf / pasted text
 [3] CONFIDENTIALITY CHECK → flag internal names / client details, ask before using
         │
         ▼
-[4] DIRECT   → pick theme + write script.json (copy, scene order, metaphors)
+[4] DIRECT   → pick theme + write script.json + script.md (copy, scene order, metaphors)
         │
         ▼
-[5] VALIDATE → scripts/validate.js checks script against schema + theme
+[5] VALIDATE → scripts/validate.js: schema + numeric checks → pass/fixed/n-a report
         │
         ▼
-[6] REVIEW   → Claude shows script.md (human-readable screenplay); user edits in plain language; loop until approved
+[GATE 1 — SCRIPT] → Claude shows script.md; user edits in plain language; script frozen on approval
         │
         ▼
-[7] PREVIEW  → preview.html plays live in the browser with real-time audio
+[6] THREE STILLS → render start/mid/settled frame for each scene
         │
         ▼
-[8] RENDER   → Playwright steps frames + OfflineAudioContext renders WAV → ffmpeg → MP4
+[GATE 2 — PREVIEW] → Claude shows frame sheet + key stills; user approves; full render on go
         │
         ▼
-out/reel-16x9.mp4, out/preview.html, out/reel.srt
+[7] RENDER   → Playwright (chunked) + OfflineAudioContext → WAV → ffmpeg → MP4 + framesheet
+        │
+        ▼
+[8] CHECK    → scripts/check-audio.js + framesheet scan; print full pass/fixed/n-a report
+        │
+        ▼
+out/reel-16x9.mp4, out/framesheet.jpg, out/preview.html, out/reel.srt, out/reel-readme.gif
 ```
 
-Steps 1–4 and 6 are done by Claude, guided by SKILL.md. Steps 5 and 7–8 are **plain code** (deterministic, no AI). That split is the core idea: the AI writes the script, code makes the movie.
+Steps 1–4 and the two gates are done by Claude, guided by SKILL.md. Steps 5–8 are **plain code** (deterministic, no AI). That split is the core idea: the AI writes the script, code makes the movie.
+
+**Retry limit:** if a render fails validation, Claude may attempt fix-and-rerender at most **3 times**. After 3 attempts, stop and tell the user exactly what is broken instead of looping.
 
 **Critical separation:** facts describe what the person actually did. Visuals are the theme's metaphors. A visual key like `lidar_road` is a rendering choice, not a fact about the person. It must never appear in facts.json.
 
@@ -117,9 +125,11 @@ resumotion/
 │   ├── build-preview.js       # script.json + theme → standalone preview.html
 │   ├── render.js              # Playwright + ffmpeg → MP4 (chunked, resumable)
 │   ├── check-audio.js         # loudness (LUFS), peaks, silence, drop level
-│   └── export-captions.js     # script.json → reel.srt
+│   ├── export-captions.js     # script.json → reel.srt
+│   └── export-readme.js       # best-moments loop → GIF/WebP + paste snippet
 ├── assets/fonts/              # bundled OFL fonts (Syne, JetBrains Mono, etc.)
 ├── examples/                  # 3–5 sample resumes (fake people) + their outputs
+├── TASTE.md                   # user-reported preferences the skill reads each run (pace, density, etc.)
 ├── reference/
 │   └── nidhi-reel-v2.html     # v2 reel = quality bar (personal details stripped)
 ├── gallery/                   # community reels (linked, not committed as video)
@@ -297,22 +307,25 @@ description: Turn a resume, CV, portfolio, or LinkedIn text into a pro, beat-syn
 Body steps:
 
 1. **Extract** facts.json from the input. Copy facts only. Mark unknowns `null`.
-2. **Check the minimum:** name + role + at least one thing they did. If missing, ask at most 3 short questions:
-   - "What do you do, in a few words?"
-   - "One thing you're proud of?"
-   - "What are you looking for next?"
-   Never ask more than 3. Never invent answers.
-3. **Confidentiality check.** Before writing the script, flag any internal team names, internal tool names, client details, or employer-confidential metrics. Ask the user: "I noticed [X] — is it OK to show this on screen?" Wait for the answer. Log it in facts.json under `confidential_note`.
+2. **Check the minimum:** name + role + at least one thing they did. If missing, ask at most 3 short questions: "What do you do, in a few words?" / "One thing you're proud of?" / "What are you looking for next?" Never ask more than 3. Never invent answers.
+3. **Confidentiality check.** Flag any internal team names, internal tool names, client details, or employer-confidential metrics. Ask: "I noticed [X] — is it OK to show this on screen?" Wait for the answer. Log it in facts.json under `confidential_note`.
 4. **Pick a theme** using `references/themes.md`. Say in one line why it fits.
-5. **Find the metaphor.** Per project, pick a `visual` from the theme library that matches what the project *is*, not a generic card. Visuals are rendering choices — they never flow back into facts.json.
-6. **Write the copy** using `references/copywriting.md`. Default is `density: "punchy"` (≤6 words per beat group, verbs over adjectives, numbers when real). If the user asks for more detail, switch to `density: "detailed"`.
-7. **Write script.json and script.md.** Scale the length to the content: thin resume ≈ 30 s, rich resume ≈ 50 s. Skip scenes with no data. Don't pad.
-8. Run `node scripts/validate.js script.json`. Fix errors and rerun.
-9. **REVIEW loop.** Show the user script.md — the full screenplay as a readable list: every scene, its time range, every piece of on-screen text. Say: "Here's the full script. Reply with any changes in plain language — I'll update and show you stills of changed scenes before the full render." Apply changes, update facts.json for any corrections, re-validate, show stills. Repeat until the user approves.
-10. Run `node scripts/build-preview.js` and then `node scripts/render.js`.
-11. Run `node scripts/check-audio.js`. Report the result.
-12. Run `node scripts/export-captions.js`. Include `reel.srt` in the output.
-13. Reply with: files, theme used, one-line concept, and "anything to change?"
+5. **Find the metaphor.** Per project, pick a `visual` from the theme library that matches what the project *is*. Visuals are rendering choices — never flow back into facts.json.
+6. **Write the copy** using `references/copywriting.md`. Default `density: "punchy"` (≤6 words per beat group, verbs over adjectives, numbers when real). Switch to `density: "detailed"` only if the user asks.
+7. **Write script.json and script.md.** Scale length to content: thin resume ≈ 30 s, rich ≈ 50 s. Skip scenes with no data. Don't pad.
+8. Run `node scripts/validate.js script.json`. Fix errors and rerun. Print the full pass/fixed/n-a report. Maximum 3 fix-and-rerun attempts — after that, stop and tell the user what's broken.
+
+**— GATE 1: SCRIPT —**
+
+9. Show the user script.md — every scene, its time range, every word of on-screen text. Say: "Here's the full script. Reply with any changes. Once you approve it, the words are frozen." Apply changes, name exactly what changed ("Slowed the stats section by 2 beats, changed 'engineer' to 'builder'"). Update facts.json for any factual corrections. Re-validate. Repeat until the user says go.
+
+**— GATE 2: PREVIEW —**
+
+10. Run `node scripts/render.js --stills-only`. This renders the start, mid, and settled frame for each scene. Show the frame sheet and key stills to the user. Say: "Here's how it looks. Reply go to render the full video, or tell me what to change."
+11. On "go": run `node scripts/render.js` (full render).
+12. Run `node scripts/check-audio.js`. Print the full pass/fixed/n-a report.
+13. Run `node scripts/export-captions.js`. Include `reel.srt` in the output.
+14. Reply with: all output files, theme used, one-line concept, and "anything to change?" If the user asks for changes, name exactly what you changed — never just "done."
 
 Keep SKILL.md under ~300 lines. Detailed stuff goes in `references/`.
 
@@ -470,21 +483,78 @@ Each theme must have a **generic fallback visual** for projects that match nothi
 
 ## 10. The quality bar ("would a pro make this?")
 
-Every theme and every render must pass:
+Every check must return **pass**, **fixed**, or **n/a**. `fixed` and `n/a` require a one-line note. Claude cannot silently skip a check. `validate.js` prints the full report at the end of every run.
+
+### 10.1 Numeric checks (code-enforceable)
+
+| Check | Rule |
+|---|---|
+| Text on-screen duration | ≥ `words ÷ 3 + 1` seconds per text block |
+| Safe area | All text stays ≥ 5% inside every edge |
+| Contrast | ≥ 4.5:1 at the worst frame |
+| Loudness | −14 LUFS ±1, true peak ≤ −1 dBTP |
+| Audio-visual sync | Each visual hit lands within 2 frames of its sound |
+| Stagger | Related elements staggered 2–4 frames, never animated as one block |
+| Flash rate | ≤ 3 full-screen flashes per second |
+| Text overflow | Zero — measured with real font metrics in headless Chromium |
+
+### 10.0 Variety rule
+
+Two different resumes in the same theme must look clearly different. After Phase 1, render all 5 example resumes and put their frame sheets side by side. If a stranger can't tell they're different people without reading the text, add more variants.
+
+**How variety is achieved — in order of impact:**
+
+1. **Content drives layout.** Different scene lists, different lengths, different name sizes, different metaphors. This is free and the strongest source of difference.
+2. **Scene variants.** Each frequently-used scene type (`project`, `name_slam`, `outro`) has 2–3 layout variants. `theme.json` lists them; Claude picks one based on the content.
+3. **Name-based seed.** The PRNG seed is derived from the person's name (`hash(name)`). Every person gets their own grain pattern, jitter, glitch timing, and variant selection. Same person = same video every time. Different person = different video.
+4. **Palette variants.** If the person has brand colors, use them as accent. Otherwise pick from 4–5 approved palettes per theme.
+5. **Transition pool.** Each theme has a pool of carriers (wipes, masks, lines). Never use the same carrier twice in a row.
+
+**Taste questions (asked by Claude, 2 max):**
+- "One word that describes how you want this to feel?" → calm / fast / precise / playful → maps to transition speed and music arrangement
+- "Any brand colors?" → accent override
+
+Claude maps answers to script choices. The user never sees variant names or technical parameters.
+
+**`theme.json` variant format:**
+```json
+"project": {
+  "beats": [6, 10],
+  "variants": ["slam_right", "fullscreen_visual", "split_wipe"],
+  "visuals": ["generic_detect", "route_draw", "depth_map", "build_bar"]
+}
+```
+
+Claude writes the chosen variant into `script.json` as `"variant": "slam_right"`. The engine executes it. Variant selection is Claude's job, not the engine's.
+
+### 10.2 Structural checks (human-reviewable)
 
 - [ ] **Frame 1 is designed**, not black, not a loading state. The last frame rhymes with the first.
+- [ ] **The screen never goes blank.** During the audio silence beat, something is always on screen — at minimum a dot or the name.
 - [ ] Every cut lands on a beat or a 16th note.
-- [ ] Every visual event has a sound. Nothing big happens silently, except deliberate silence.
+- [ ] **Every cut has a carrier.** A shape, line, mask or wipe brings the next scene in. Crossfades are a last resort, not a default.
+- [ ] **Sound hierarchy:** big moments (name slam, drop, outro) get full hits. Small moments (stat tick, box lock) get soft ticks. Some micro-moments get nothing. Not every event needs a sound — but nothing big should happen silently.
 - [ ] One clear concept per theme (a metaphor from the person's world), not a slideshow.
 - [ ] Type is big, tight, and readable on a phone in 9:16.
-- [ ] No text overflow, no clipped letters, contrast passes.
 - [ ] There's texture (grain, jitter, imperfection) so it doesn't feel sterile.
 - [ ] Silence and negative space are used on purpose.
 - [ ] It works on mute too (meaning is carried by the visuals).
 - [ ] End card is tasteful and short.
-- [ ] Flash rate ≤ 3 per second (photosensitivity safety).
 
 If a theme draft feels like a template, **start over**.
+
+### 10.3 Frame sheet
+
+Every render produces a frame sheet: one frame per second, tiled into a single image (`out/framesheet.jpg`). The frame sheet is automatically scanned for:
+- Black frames (any frame with average luminance < 2%)
+- Flash frames (any frame > 50% brighter than the previous)
+- Frozen frames (any two consecutive frames with pixel diff < 0.1%)
+
+The frame sheet is also a **free deliverable** — users can post it alongside their reel as a contact sheet. Include it in the output alongside the MP4.
+
+### 10.4 Three stills before motion
+
+Before rendering the full video, render three key frames per new or changed scene: the start frame, the mid frame, and the settled frame. Show these to the user during the REVIEW gate. Full render only happens after approval. This catches layout problems in seconds, not minutes.
 
 ---
 
@@ -551,6 +621,65 @@ Keep a simple `metrics.md` (or a sheet) with weekly numbers.
 
 ---
 
+## 12.5 GitHub README loop
+
+A reel that lives permanently on a developer's GitHub profile. Recruiters, collaborators and visitors see it every time they land on that profile — unlike a LinkedIn post that disappears in two days.
+
+### Why this is the strongest dev distribution
+
+- Devs already decorate their READMEs with stats cards, typing animations and badges. A moving career reel fits right in.
+- Every embed is a permanent ad: the `made with resumotion°` link under it is a lasting backlink to the repo.
+- It lives where devs show off. It spreads better among devs than the full MP4, because it requires no click to play.
+
+### What gets built
+
+**`export-readme.js`** — a separate export pass that produces the README cut.
+
+**The README cut is not a shrunk copy of the reel.** It is designed specifically for silent, looping, no-click viewing:
+- **Duration:** 6–10 seconds, seamless loop.
+- **Moments:** name slam → thesis line → one project → stack flash. The highest-impact beats only.
+- **Width:** ~800 px.
+- **Sound:** none. The cut must read perfectly on mute — no subtitles needed, because the text is already on screen.
+- **Loop design:** the last frame fades or cuts back cleanly to the first. The dot motif (end card) helps here — end on the dot, loop back to the boot line.
+- **Format:** GIF or animated WebP. Target under 3 MB for fast loading. Animated SVG as a stretch goal (tiny, crisp, zero compression artefacts — no other tool offers this).
+
+**Output files:**
+```
+out/reel-readme.gif        ← primary: works everywhere, autoplays
+out/reel-readme.webp       ← secondary: smaller, modern browsers only
+out/README-snippet.md      ← ready-to-paste markdown
+```
+
+**`README-snippet.md` content:**
+```markdown
+[![My reel](reel-readme.gif)](https://link-to-full-video-with-sound)
+
+<sub>made with [resumotion°](https://github.com/<me>/resumotion)</sub>
+```
+
+The snippet links the GIF to the full MP4 (wherever the user hosts it — YouTube, Cloudinary, their site). Clicking the loop plays the version with sound.
+
+### Technical notes
+
+- `export-readme.js` takes a `--scenes name_slam,thesis,stack_flash` flag so the user can customise which moments appear.
+- GIF encoding: use `ffmpeg`'s palette generation (`palettegen` + `paletteuse`) for best quality at small size.
+- Animated WebP: `ffmpeg -c:v libwebp_anim`.
+- If the theme uses a seeded PRNG, the README cut will be identical every time it is re-exported from the same script.json.
+- The framesheet scan (section 10.3) also runs on the README cut to catch black or frozen frames.
+
+### How to push it
+
+- Put your own README loop on your GitHub profile before launch. It's the demo, and devs who visit your profile will ask about it.
+- In launch posts, include: *"it also makes a loop for your GitHub profile README"* — gives devs a specific, immediate reason to try it.
+- Add a **"Profiles using resumotion°"** section to the repo README and the showcase site. People like being featured, and the list shows real usage.
+- Feature the README loop prominently in the README's own demo section, so the first thing devs see when they land on the repo is the format they can use right now, without even watching the full reel.
+
+### Phase placement
+
+Add `export-readme.js` at the end of Phase 1 (it reuses the same Playwright frames, just a shorter clip). The paste snippet and "Profiles" section go in Phase 2.
+
+---
+
 ## 13. Launch plan
 
 ### Before launch
@@ -561,7 +690,7 @@ Keep a simple `metrics.md` (or a sheet) with weekly numbers.
 - [ ] Personal details stripped from the reference reel before it's committed.
 
 ### Launch day (one day, all channels)
-- **X:** native video of the best reel + "I built a free Claude plugin that turns your resume into this. Open source." Then a thread: concept → beat clock → synthesized sound → themes → link.
+- **X:** native video of the best reel + "I built a free Claude plugin that turns your resume into this. Open source. It also makes a loop for your GitHub profile README." Then a thread: concept → beat clock → synthesized sound → themes → README loop → link.
 - **LinkedIn:** the same video with a story caption ("my resume didn't feel like my work, so…"). Weekday morning IST. Reply to every comment in the first hour.
 - **Reddit:** r/ClaudeAI, r/ClaudeCode, r/SideProject, r/webdev (read each sub's rules first).
 - **Communities:** Anthropic Discord, Peerlist launchpad, Show HN.
@@ -637,6 +766,9 @@ The plugin is the best first move: cheap, devs amplify it, stars give credibilit
 | Indic/non-Latin script rendering breaks | One FontFace per script family; do not bundle multiple scripts under one family name |
 | claude.ai sandbox time limit kills render | Chunked `--from`/`--to` flags in render.js |
 | script.json breaks after theme update | `theme_version` pinned in script; validate.js checks compatibility and fails loudly |
+| AI silently changes approved words | Script is frozen at Gate 1; post-approval edits require explicit user confirmation |
+| Render loops burning usage | 3-attempt retry limit; stop and report what's broken instead of looping |
+| User reports vague "feels wrong" bug | Sort as error (→ new check in validate.js) or taste (→ TASTE.md preference). Errors become permanent checks. |
 
 ---
 
