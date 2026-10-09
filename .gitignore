@@ -47,6 +47,7 @@ test-results/
 
 # personal reference reels (strip before committing)
 examples/reference/
+themes/*/reference.html
 
 # plan docs — internal, not for the public repo
 RESUMOTION_PLAN*.md
