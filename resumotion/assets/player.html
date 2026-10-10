@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>resumotion° player</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; background: #000; display: flex;
+    flex-direction: column; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; color: #F2EDE6; overflow: hidden; }
+  #wrap { position: relative; }
+  canvas { display: block; max-width: 100vw; max-height: 100vh; }
+  #ui { position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,.85));
+    padding: 14px 16px 18px; display: flex; align-items: center; gap: 10px;
+    opacity: 0; transition: opacity .2s; }
+  #wrap:hover #ui, #ui:focus-within { opacity: 1; }
+  .btn { background: none; border: 1.5px solid rgba(255,255,255,.35); color: #fff;
+    padding: 5px 13px; cursor: pointer; font-size: 12px; font-family: inherit;
+    border-radius: 3px; white-space: nowrap; }
+  .btn:hover { border-color: #fff; }
+  #scrub { flex: 1; accent-color: #FF6B2B; cursor: pointer; }
+  #time { font-size: 11px; opacity: .55; min-width: 80px; text-align: right; }
+  #overlay { position: absolute; inset: 0; display: flex; align-items: center;
+    justify-content: center; cursor: pointer; }
+  #playBtn { width: 72px; height: 72px; border-radius: 50%;
+    background: rgba(255,107,43,.9); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .15s, opacity .15s; }
+  #playBtn:hover { transform: scale(1.08); }
+  #playBtn svg { margin-left: 5px; }
+  #overlay.hidden { pointer-events: none; }
+  #overlay.hidden #playBtn { opacity: 0; transform: scale(.8); }
+  #soundOn { position: absolute; top: 12px; right: 12px;
+    background: rgba(0,0,0,.6); border: 1.5px solid rgba(255,255,255,.3);
+    color: #fff; padding: 5px 12px; font-size: 11px; font-family: inherit;
+    cursor: pointer; border-radius: 3px; }
+  #recBtn { border-color: rgba(255,80,80,.6); }
+  #recBtn.recording { border-color: #f55; color: #f55; animation: blink 1s step-start infinite; }
+  @keyframes blink { 50% { opacity: .4 } }
+  #credit { position: absolute; bottom: 6px; right: 12px; font-size: 9px;
+    opacity: .25; pointer-events: none; letter-spacing: .03em; }
+</style>
+<!-- /*FONTS*/ -->
+</head>
+<body>
+<div id="wrap">
+  <canvas id="c"></canvas>
+  <div id="overlay">
+    <button id="playBtn" aria-label="Play with sound">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="white">
+        <polygon points="8,4 24,14 8,24"/>
+      </svg>
+    </button>
+  </div>
+  <div id="ui">
+    <button id="play" class="btn">▶ Play</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" step="1">
+    <span id="time">0:00 / 0:00</span>
+    <button id="recBtn" class="btn" title="Record video (no installs needed)">⏺ Record</button>
+  </div>
+  <button id="soundOn">▶ sound on</button>
+  <span id="credit">made with resumotion°</span>
+</div>
+
+<!-- Injected by build.py: image data URIs from facts.json -->
+<script>
+/*IMGS*/
+</script>
+
+<!-- Injected by build.py: reel scenes (scenes.js) -->
+<script>
+/*SCENES*/
+</script>
+
+<!-- Injected by build.py: reel score (score.js) -->
+<script>
+/*SCORE*/
+</script>
+
+<!-- Player runtime (do not modify) -->
+<script>
+(function () {
+'use strict';
+
+const canvas  = document.getElementById('c');
+const ctx     = canvas.getContext('2d');
+const playBtn = document.getElementById('play');
+const bigBtn  = document.getElementById('playBtn');
+const overlay = document.getElementById('overlay');
+const scrub   = document.getElementById('scrub');
+const timeEl  = document.getElementById('time');
+const soundBtn = document.getElementById('soundOn');
+const recBtn  = document.getElementById('recBtn');
+
+let ac, audioBuf, audioSrc;
+let playing = false, t = 0, startWall = 0, startT = 0, raf;
+let DUR = 60, FPS = 30;
+
+// ── Helpers ──
+const fmt = s => { const m = Math.floor(s/60), sec = Math.floor(s%60); return `${m}:${String(sec).padStart(2,'0')}`; };
+
+function resize() {
+  const meta = window.__meta || {};
+  const W = meta.W || 1920, H = meta.H || 1080;
+  const scale = Math.min(window.innerWidth / W, window.innerHeight / H);
+  canvas.width = W; canvas.height = H;
+  canvas.style.width  = Math.round(W * scale) + 'px';
+  canvas.style.height = Math.round(H * scale) + 'px';
+}
+
+function draw(time) { if (window.__render) window.__render(time); }
+
+function tick() {
+  if (!playing) return;
+  t = Math.min(DUR, startT + (performance.now() / 1000 - startWall));
+  draw(t);
+  scrub.value = (t / DUR * 1000).toFixed(0);
+  timeEl.textContent = `${fmt(t)} / ${fmt(DUR)}`;
+  if (t >= DUR) { stop(); return; }
+  raf = requestAnimationFrame(tick);
+}
+
+function play() {
+  if (!ac) { soundBtn.style.display = 'flex'; return; }
+  startWall = performance.now() / 1000;
+  startT = t;
+  playing = true;
+  playBtn.textContent = '⏸ Pause';
+  overlay.classList.add('hidden');
+  if (audioSrc) { try { audioSrc.stop(); } catch {} }
+  if (audioBuf) {
+    audioSrc = ac.createBufferSource();
+    audioSrc.buffer = audioBuf;
+    audioSrc.connect(ac.destination);
+    audioSrc.start(0, t);
+  }
+  raf = requestAnimationFrame(tick);
+}
+
+function stop() {
+  playing = false;
+  cancelAnimationFrame(raf);
+  playBtn.textContent = '▶ Play';
+  if (t >= DUR) { t = 0; overlay.classList.remove('hidden'); }
+}
+
+async function initAudio() {
+  if (ac) return;
+  ac = new AudioContext();
+  soundBtn.style.display = 'none';
+  if (window.__audio) {
+    try {
+      const b64 = await window.__audio();
+      if (b64) {
+        const str = atob(b64.replace(/^data:[^,]+,/, ''));
+        const buf = new Uint8Array(str.length).map((_,i) => str.charCodeAt(i));
+        audioBuf = await ac.decodeAudioData(buf.buffer);
+      }
+    } catch (e) { console.warn('[player] audio init failed:', e); }
+  }
+}
+
+// ── Record video (canvas captureStream + MediaRecorder — no installs) ──
+let _recorder, _chunks;
+async function toggleRecord() {
+  if (_recorder && _recorder.state === 'recording') {
+    _recorder.stop();
+    recBtn.classList.remove('recording');
+    recBtn.textContent = '⏺ Record';
+    return;
+  }
+  if (!ac) await initAudio();
+
+  // Capture canvas at reel FPS
+  const stream = canvas.captureStream(FPS);
+
+  // Mix audio into the stream if available
+  if (ac && audioBuf) {
+    const dest = ac.createMediaStreamDestination();
+    const src2 = ac.createBufferSource();
+    src2.buffer = audioBuf;
+    src2.connect(dest);
+    src2.start(0, t);
+    dest.stream.getAudioTracks().forEach(track => stream.addTrack(track));
+  }
+
+  _chunks = [];
+  const mime = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4']
+    .find(m => MediaRecorder.isTypeSupported(m)) || '';
+  _recorder = new MediaRecorder(stream, mime ? { mimeType: mime } : {});
+  _recorder.ondataavailable = e => { if (e.data.size) _chunks.push(e.data); };
+  _recorder.onstop = () => {
+    const blob = new Blob(_chunks, { type: _recorder.mimeType });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'reel.webm'; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  };
+  _recorder.start(200);
+  recBtn.classList.add('recording');
+  recBtn.textContent = '⏹ Stop';
+  // Start playback from beginning
+  t = 0; play();
+}
+
+// ── Event listeners ──
+playBtn.addEventListener('click', async () => {
+  if (!ac) await initAudio();
+  playing ? stop() : play();
+});
+bigBtn.addEventListener('click', async () => {
+  if (!ac) await initAudio();
+  play();
+});
+soundBtn.addEventListener('click', async () => { await initAudio(); play(); });
+recBtn.addEventListener('click', toggleRecord);
+
+scrub.addEventListener('input', () => {
+  t = scrub.value / 1000 * DUR;
+  startT = t; startWall = performance.now() / 1000;
+  draw(t);
+  timeEl.textContent = `${fmt(t)} / ${fmt(DUR)}`;
+  if (audioSrc && playing) { try { audioSrc.stop(); } catch {} audioSrc = null; play(); }
+});
+
+window.addEventListener('resize', resize);
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space')      { e.preventDefault(); playBtn.click(); }
+  if (e.code === 'ArrowLeft')  { t = Math.max(0, t-2); draw(t); scrub.value = (t/DUR*1000).toFixed(0); }
+  if (e.code === 'ArrowRight') { t = Math.min(DUR, t+2); draw(t); scrub.value = (t/DUR*1000).toFixed(0); }
+});
+
+// ?t= freeze mode (stills.js and debug)
+const urlT = new URLSearchParams(location.search).get('t');
+if (urlT !== null) {
+  document.getElementById('ui').style.display = 'none';
+  overlay.style.display = 'none';
+  soundBtn.style.display = 'none';
+  recBtn.style.display = 'none';
+}
+
+// ── Init ──
+async function init() {
+  await (window.__ready || Promise.resolve());
+  const meta = window.__meta || {};
+  DUR = meta.DUR || 60; FPS = meta.FPS || 30;
+  resize();
+  timeEl.textContent = `0:00 / ${fmt(DUR)}`;
+  if (urlT !== null) draw(parseFloat(urlT));
+  else draw(0);
+}
+init();
+
+})();
+</script>
+</body>
+</html>

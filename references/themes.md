@@ -43,14 +43,18 @@ Say why in one line before writing anything else. Example: *"Going with Percepti
 
 ---
 
-## Build order (what's ready)
+## Build order (status)
+
+Two statuses:
+- **ready** — THEME.md + a reference.html built from a real person's reel. Safe to use normally.
+- **draft** — THEME.md only. The first real build for an actual person becomes the reference. See SKILL.md §"Draft themes" for how to handle.
 
 | Theme | Status |
 |---|---|
-| `perception` | ✅ THEME.md + reference.html |
-| `speedrun` | ✅ THEME.md + reference.html |
-| `ipo` | ✅ THEME.md + reference.html |
-| `blueprint` | ✅ THEME.md (no reference.html yet — first build becomes the reference) |
-| `prospectus` | ⚠️ reference.html exists, THEME.md needed |
-| `context_window` | ⚠️ concept defined, THEME.md + reference.html needed |
-| `general` | ⚠️ not built |
+| `perception` | ✅ ready |
+| `speedrun` | ✅ ready |
+| `ipo` | ✅ ready |
+| `prospectus` | ✅ ready |
+| `blueprint` | 🟡 draft — THEME.md exists; first real build becomes reference.html |
+| `context_window` | 🟡 draft — THEME.md exists; first real build becomes reference.html |
+| `general` | 🟡 draft — THEME.md exists; first real build becomes reference.html |

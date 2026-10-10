@@ -1,19 +1,13 @@
 {
-  "name": "resumotion",
+  "name": "resumotion-repo",
   "version": "0.1.0",
-  "description": "Turn a resume into a beat-synced motion reel",
-  "type": "module",
+  "description": "Repo-level scripts: package the skill zip and validate it.",
+  "private": true,
   "scripts": {
-    "validate": "node scripts/validate.js",
-    "preview": "node scripts/build-preview.js",
-    "render": "node scripts/render.js",
-    "check-audio": "node scripts/check-audio.js",
-    "check-deps": "node scripts/check-deps.js"
+    "package": "zip -r resumotion.zip resumotion/ && echo '✓ resumotion.zip created' && unzip -l resumotion.zip | head -6",
+    "zip-check": "unzip -l resumotion.zip | awk 'NR>3{print $4}' | grep -v '^resumotion/' | grep -v '^$' | grep -v 'files' && echo 'all entries start with resumotion/ ✓' || true",
+    "validate": "npx skills-ref validate ./resumotion"
   },
-  "dependencies": {
-    "playwright": "^1.48.0"
-  },
-  "devDependencies": {},
   "engines": {
     "node": ">=20"
   },

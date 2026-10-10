@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prospectus — Rameshwari Chaudhary</title>
+<style>
+/*FONTS*/
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:#07152A;overflow:hidden}
+#wrap{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+canvas{display:block;max-width:100%;max-height:100%;aspect-ratio:16/9;width:100%;height:auto;background:#0B1F3A}
+#ui{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10vh}
+#play{font:600 15px 'PM',ui-monospace,monospace;letter-spacing:2px;color:#0B1F3A;background:#C8A55A;border:0;padding:15px 28px;cursor:pointer}
+#play:focus-visible,#again:focus-visible{outline:2px solid #F5F1E8;outline-offset:4px}
+#again{position:absolute;right:16px;bottom:16px;font:400 13px 'PM',ui-monospace,monospace;color:#F5F1E8;background:transparent;border:1px solid #C8A55A;padding:8px 14px;cursor:pointer;display:none}
+</style></head><body>
+<div id="wrap"><canvas id="cv" width="1920" height="1080"></canvas>
+<div id="ui"><button id="play">OPEN THE PROSPECTUS · SOUND ON</button></div>
+<button id="again">Replay</button></div>
+<script>
+'use strict';
+const W=1920,H=1080,FPS=30,BPM=96,B=60/BPM,TB=b=>b*B;
+const C={bg:'#0B1F3A',bg2:'#0F2747',iv:'#F5F1E8',mu:'#93A0B4',gd:'#C8A55A',gn:'#3FA37A',ln:'#22395C',dk:'#081629'};
+const cl=(x,a=0,b=1)=>x<a?a:x>b?b:x,P=(t,a,b)=>cl((t-a)/(b-a)),L=(a,b,k)=>a+(b-a)*k;
+const eo=x=>x>=1?1:1-Math.pow(2,-10*x),ei=x=>x<=0?0:Math.pow(2,10*x-10),eio=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const es=x=>1-Math.pow(1-cl(x),3);
+const hs=n=>{const x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+const SF=(s,w=600)=>`${w} ${s}px FR`,SI=s=>`italic 400 ${s}px FR`,MO=(s,w=400)=>`${w} ${s}px PM`;
+/*QR*/
+// ---- scene table (beats) ----
+const SC=[['cover',0,8],['found',8,16],['range',16,25],['pivot',25,33],['ma',33,44],['dcf',44,52],['lbo',52,60],['league',60,73],['lead',73,81],['skills',81,88],['close',89,98]];
+const DUR=TB(98);
+const S={};SC.forEach(([n,a,b])=>S[n]=[TB(a),TB(b)]);
+const MARK={cover:2023.0,found:2023.6,range:2025.4,pivot:2026.05,ma:2026.25,dcf:2026.33,lbo:2026.38,league:2026.45,lead:2026.55,skills:2026.77,close:2027.45};
+const MLAB={cover:'',found:'2023 · B.Tech begins',range:'2025 · AI minor · DRC mentor',pivot:'2026 · into finance',ma:'Apr 2026',dcf:'May 2026',lbo:'May 2026',league:'case competitions',lead:'2026 – present',skills:'today',close:'Summer 2027'};
+const LEAGUE=[['1st','Stratopia','VJTI'],['1st','Stratos’26','SPCG × E-Cell Case Competition'],['3rd','M&A Bullzire','SRCC'],['3rd','ProdWhiz’26','IIM Indore'],['Finalist','Wall Street Research Challenge','BITS'],['Finalist','ERC','IIT Guwahati'],['Finalist','PMX','IIT Guwahati'],['Finalist','Consulting Pioneers',''],['Finalist','UtKrama National Case Competition','']];
+const CERTS=[['JPMorgan Chase','Investment Banking Virtual Experience · Forage'],['McKinsey','Forward Program'],['NISM','SEBI Investor Awareness Test'],['CFI','Accounting Fundamentals'],['CFI','Corporate Finance Fundamentals'],['CFI','Reading Financial Statements'],['Udemy','The Complete Investment Banking Course 2026']];
+const EMAIL='rameshwari.chaudhary2005@gmail.com',LI='linkedin.com/in/rameshwari28';
+
+// ---- canvas ----
+const cv=document.getElementById('cv'),X=cv.getContext('2d');const mk=(w=W,h=H)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c};
+const buf=mk(),BX=buf.getContext('2d');
+const bgc=mk();{const g=bgc.getContext('2d');const r=g.createRadialGradient(W*.55,H*.42,80,W*.55,H*.42,W*.8);r.addColorStop(0,C.bg2);r.addColorStop(1,'#08182F');g.fillStyle=r;g.fillRect(0,0,W,H);
+ g.strokeStyle='rgba(200,165,90,.035)';g.lineWidth=1;for(let x=160;x<W;x+=80){g.beginPath();g.moveTo(x,0);g.lineTo(x,H);g.stroke()}}
+const GR=[];for(let k=0;k<6;k++){const c=mk(960,540),g=c.getContext('2d'),id=g.createImageData(960,540);let s=k*7919+3;for(let i=0;i<id.data.length;i+=4){s=(s*1664525+1013904223)>>>0;const v=s>>>24;id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255}g.putImageData(id,0,0);GR.push(c)}
+let FR=0;
+function T(c,s,x,y,o){c.save();c.font=o.f;c.fillStyle=o.c||C.iv;c.globalAlpha=o.a??1;c.textAlign=o.al||'left';c.textBaseline='alphabetic';c.letterSpacing=(o.ls||0)+'px';c.fillText(s,x,y);c.restore()}
+function TW(c,s,f,ls=0){c.save();c.font=f;c.letterSpacing=ls+'px';const w=c.measureText(s).width;c.restore();return w}
+function FIT(c,s,fn,mx,mw,ls=0){const w=TW(c,s,fn(mx),ls);return w>mw?Math.floor(mx*mw/w):mx}
+// masked rise
+function R(c,s,x,y,sz,k,o){if(k<=0)return;const w=TW(c,s,o.f,o.ls||0);const x0=o.al==='center'?x-w/2:o.al==='right'?x-w:x;c.save();c.beginPath();c.rect(x0-30,y-sz*1.1,w+60,sz*1.45);c.clip();T(c,s,x,y+(1-es(k))*sz*1.15,o);c.restore()}
+function RULE(c,x,y,w,k,col=C.gd,lw=1.5,a=1){if(k<=0)return;c.save();c.globalAlpha=a;c.strokeStyle=col;c.lineWidth=lw;c.beginPath();c.moveTo(x,y);c.lineTo(x+w*eio(k),y);c.stroke();c.restore()}
+function NUM(v,k,dec=0,pre='',suf=''){const n=v*es(k);return pre+(dec?n.toFixed(dec):Math.round(n).toLocaleString('en-US'))+suf}
+function HEAD(c,t,t0,no,label){R(c,`${no} · ${label}`,160,214,20,P(t,t0,t0+.5),{f:MO(20,600),c:C.gd,ls:4});RULE(c,160,236,1600,P(t,t0+.1,t0+.9),C.ln,1)}
+// scene envelope: local k in, fade out
+function ENV(c,t,n,fn){const [a,b]=S[n];if(t<a-.01||t>b+.01)return;const out=P(t,b-.4,b);c.save();c.globalAlpha=1-eio(out);c.translate(0,-eio(out)*24);fn(c,t,a,b);c.restore()}
+function TOMB(c,x,y,w,h,k,lines){if(k<=0)return;c.save();c.globalAlpha=es(k);c.translate(0,(1-es(k))*30);c.fillStyle='rgba(8,22,41,.6)';c.fillRect(x,y,w,h);c.strokeStyle=C.gd;c.lineWidth=1.5;c.strokeRect(x,y,w,h);c.strokeRect(x+10,y+10,w-20,h-20);
+ let yy=y+70;lines.forEach(([s,f,col,gap])=>{T(c,s,x+w/2,yy,{f,c:col||C.iv,al:'center',ls:f.includes('PM')?2:0});yy+=gap});c.restore()}
+
+// ---- timeline axis (persistent) ----
+const AX0=160,AX1=1760,AY=968,Y0=2023,Y1=2027.6;const XY=y=>AX0+(y-Y0)/(Y1-Y0)*(AX1-AX0);
+function curScene(t){let n='cover';for(const [k,a] of SC)if(t>=TB(a))n=k;return n}
+function AXIS(c,t){const draw=P(t,TB(3),TB(5.5));if(draw<=0)return;const fo=1-P(t,DUR-TB(3),DUR-TB(1.4));c.save();c.globalAlpha=fo;
+ const today=XY(2026.77);c.strokeStyle=C.ln;c.lineWidth=2;c.beginPath();c.moveTo(AX0,AY);c.lineTo(L(AX0,today,eio(draw)),AY);c.stroke();
+ if(draw>.95){c.setLineDash([6,8]);c.beginPath();c.moveTo(today,AY);c.lineTo(AX1,AY);c.stroke();c.setLineDash([])}
+ for(let y=2023;y<=2027;y++){const x=XY(y);const k=P(draw,(y-2023)/4.6,(y-2023)/4.6+.15);if(k<=0)continue;c.globalAlpha=fo*k;c.fillStyle=C.mu;c.fillRect(x-1,AY-8,2,16);T(c,String(y),x,AY+42,{f:MO(18),c:C.mu,al:'center'})}
+ c.globalAlpha=fo;
+ // marker eased between scene targets
+ let pos=Y0;for(const [n,a] of SC){const m=MARK[n];const k=eio(P(t,TB(a),TB(a)+.9));pos=L(pos,m,k)}
+ const mx=XY(pos);c.strokeStyle=C.gd;c.lineWidth=3;c.beginPath();c.moveTo(AX0,AY);c.lineTo(mx,AY);c.stroke();
+ // milestone dots passed
+ SC.forEach(([n,a])=>{if(n==='cover'||t<TB(a))return;const x=XY(MARK[n]);if(x>mx+1)return;c.fillStyle=C.gd;c.beginPath();c.arc(x,AY,5,0,7);c.fill()});
+ c.fillStyle=C.gd;c.beginPath();c.arc(mx,AY,10,0,7);c.fill();c.strokeStyle='rgba(200,165,90,.35)';c.lineWidth=2;c.beginPath();c.arc(mx,AY,18+Math.sin(t*3)*3,0,7);c.stroke();
+ const n=curScene(t),lab=MLAB[n];if(lab){const [a]=S[n];const k=P(t,a+.5,a+.9);const lw=TW(c,lab,MO(18,600),1.5)+28;const lx=cl(mx-lw/2,AX0-20,AX1-lw+20);c.globalAlpha=fo*k*(1-P(t,S[n][1]-.4,S[n][1]));
+  c.fillStyle=C.gd;c.fillRect(lx,AY-58,lw,32);T(c,lab,lx+14,AY-36,{f:MO(18,600),c:C.dk,ls:1.5})}
+ c.restore()}
+function CHROME(c,t){const k=P(t,TB(4),TB(5.5))*(1-P(t,DUR-TB(3),DUR-TB(1.4)));if(k<=0)return;c.save();c.globalAlpha=k;
+ T(c,'PROSPECTUS — RAMESHWARI CHAUDHARY',160,96,{f:MO(16,600),c:C.mu,ls:3});
+ const n=curScene(t),pg=SC.findIndex(s=>s[0]===n);T(c,'p. '+String(pg+1).padStart(2,'0'),1760,96,{f:MO(16,600),c:C.mu,al:'right',ls:2});
+ c.strokeStyle=C.ln;c.lineWidth=1;c.beginPath();c.moveTo(160,116);c.lineTo(1760,116);c.stroke();c.restore()}
+
+// ---- scenes ----
+function MONO(c,x,y,r,k,a=1){if(k<=0)return;c.save();c.globalAlpha=a;c.strokeStyle=C.gd;c.lineWidth=2;c.beginPath();c.arc(x,y,r,-Math.PI/2,-Math.PI/2+Math.PI*2*eio(k));c.stroke();
+ c.lineWidth=1;c.beginPath();c.arc(x,y,r-10,-Math.PI/2,-Math.PI/2+Math.PI*2*eio(P(k,.2,1)));c.stroke();
+ const tk=P(k,.45,1);T(c,'RC',x,y+r*.33,{f:SF(r*.9,400),c:C.gd,al:'center',a:a*es(tk),ls:-2});c.restore()}
+function cover(c,t,a,b){const ex=P(t,TB(2.6),TB(3.6));
+ // monogram centre then rises
+ const my=L(H/2,250,eio(ex)),mr=L(110,64,eio(ex));MONO(c,W/2,my,mr,t<.01?1:P(t,0,TB(2.2)));
+ if(t<TB(2.2)){T(c,'A PROSPECTUS',W/2,H/2+190,{f:MO(20,600),c:C.mu,al:'center',ls:8,a:P(t,.5,1.2)*(1-ex)})}
+ const k1=P(t,TB(3.2),TB(4.2));const nz=FIT(c,'Rameshwari Chaudhary',z=>SF(z),140,1500);
+ R(c,'Rameshwari Chaudhary',W/2,520,nz,k1,{f:SF(nz),al:'center',ls:-2});
+ R(c,'Finance & Strategy',W/2,600,52,P(t,TB(3.6),TB(4.6)),{f:SI(52),c:C.gd,al:'center'});
+ RULE(c,W/2-300,650,600,P(t,TB(4),TB(5)),C.gd,1.5);
+ R(c,'Seeking Summer 2027 internships',W/2,720,30,P(t,TB(4.5),TB(5.4)),{f:SF(30,400),al:'center'});
+ R(c,'INVESTMENT BANKING  ·  EQUITY RESEARCH  ·  CONSULTING  ·  CORPORATE STRATEGY',W/2,778,20,P(t,TB(5),TB(5.8)),{f:MO(20,600),c:C.mu,al:'center',ls:3});
+ R(c,'B.Tech EXTC · SPIT Mumbai · Class of 2027',W/2,850,22,P(t,TB(5.5),TB(6.3)),{f:MO(20),c:C.mu,al:'center',ls:1})}
+function found(c,t,a){HEAD(c,t,a,'01','FOUNDATION');
+ R(c,'An engineer’s way of thinking.',160,380,88,P(t,a+.2,a+.8),{f:SF(88),ls:-1.5});
+ R(c,'B.Tech, Electronics & Telecommunication',160,470,36,P(t,a+.5,a+1.1),{f:SF(36,400)});
+ R(c,'Bhartiya Vidya Bhavan’s Sardar Patel Institute of Technology, Mumbai · 2023 – 27',160,520,22,P(t,a+.7,a+1.3),{f:MO(22),c:C.mu});
+ const k=P(t,a+1.2,a+2.6);R(c,'CGPA',1400,420,20,P(t,a+1,a+1.4),{f:MO(20,600),c:C.gd,ls:4});R(c,NUM(8.17,k,2),1400,600,170,P(t,a+1,a+1.5),{f:SF(170,400),ls:-4});
+ RULE(c,1400,640,320,P(t,a+1.6,a+2.4))}
+function range(c,t,a){HEAD(c,t,a,'02','RANGE');
+ R(c,'Minor in Artificial Intelligence',160,380,64,P(t,a+.2,a+.8),{f:SF(64),ls:-1});
+ R(c,'Vizuara (Multidisciplinary Minor) · 2025 – 27 · CGPA '+NUM(8.57,P(t,a+.6,a+1.8),2),160,432,24,P(t,a+.5,a+1),{f:MO(24),c:C.mu});
+ R(c,'Mentor, Drones & Robotics Club',160,560,48,P(t,TB(19),TB(19)+.6),{f:SF(48),ls:-.5});
+ const st=[[20,'+','students mentored',TB(20)],[3,'','intercollegiate events organised',TB(21)],[20,'+','colleges participated',TB(22)]];
+ st.forEach(([v,suf,lab,t0],i)=>{const x=160+i*540,k=P(t,t0,t0+1);R(c,NUM(v,k,0,'',suf),x,750,120,P(t,t0,t0+.4),{f:SF(120,400),c:C.gd,ls:-2});R(c,lab,x,800,24,P(t,t0+.15,t0+.6),{f:MO(22),c:C.mu});RULE(c,x,830,440,P(t,t0+.2,t0+.9),C.ln,1)})}
+function pivot(c,t,a){HEAD(c,t,a,'03','THE PIVOT');
+ R(c,'Engineering met finance.',160,380,88,P(t,a+.2,a+.8),{f:SF(88),ls:-1.5});
+ R(c,'Certifications & courses',160,440,26,P(t,a+.5,a+1),{f:SI(30),c:C.gd});
+ CERTS.forEach(([iss,nm],i)=>{const t0=a+.9+i*TB(.75);const k=P(t,t0,t0+.5);if(k<=0)return;const y=500+i*60;const x=160+i*16;
+  c.save();c.globalAlpha=es(k);c.translate((1-es(k))*80,0);c.fillStyle=i%2?'rgba(245,241,232,.05)':'rgba(245,241,232,.08)';c.fillRect(x,y,1100,52);c.fillStyle=C.gd;c.fillRect(x,y,4,52);
+  T(c,iss.toUpperCase(),x+28,y+34,{f:MO(18,600),c:C.gd,ls:2});T(c,nm,x+260,y+35,{f:SF(26,400)});c.restore()})}
+function ma(c,t,a){HEAD(c,t,a,'04','TRANSACTIONS — I');
+ TOMB(c,160,300,560,560,P(t,a+.2,a+1),[['CASE STUDY',MO(18,600),C.gd,90],['TechNova',SF(54),C.iv,62],['× AlphaCore',SF(54),C.iv,110],['$800M',SF(96,400),C.gd,60],['acquisition evaluated',MO(20),C.mu,90],['STRATEGIC M&A VALUATION',MO(18,600),C.iv,34],['April 2026',SI(24),C.mu,0]]);
+ // waterfall
+ const ox=880,base=820,sc=1.45,bw=200,gap=90;const bars=[['Operating\ncost savings',120,0,C.gd,TB(37)],['Revenue\ngrowth',200,120,C.gd,TB(39)],['Annual value\ncreation',320,0,C.gn,TB(41)]];
+ RULE(c,ox-20,base,880,P(t,a+.6,a+1.4),C.mu,1.5,.7);T(c,'Value creation, $M per year',ox-20,300,{f:MO(20,600),c:C.mu,ls:2,a:P(t,a+.8,a+1.2)});
+ bars.forEach(([lab,v,off,col,t0],i)=>{const k=P(t,t0,t0+.8);if(k<=0)return;const x=ox+i*(bw+gap),h=v*sc*es(k),y=base-off*sc-h;c.fillStyle=col;c.globalAlpha=.92;c.fillRect(x,y,bw,h);c.globalAlpha=1;
+  T(c,NUM(v,k,0,'$','M'),x+bw/2,y-22,{f:SF(48,400),c:col===C.gn?C.gn:C.iv,al:'center'});lab.split('\n').forEach((s,j)=>T(c,s,x+bw/2,base+40+j*28,{f:MO(20),c:C.mu,al:'center',a:es(k)}));
+  if(i<2){const nk=P(t,bars[i+1][4]-.2,bars[i+1][4]+.2);if(nk>0){c.save();c.strokeStyle=C.mu;c.setLineDash([6,6]);c.globalAlpha=.6;c.beginPath();const ly=i==0?base-120*sc:base-320*sc;c.moveTo(x+bw,ly);c.lineTo(x+bw+gap*eio(nk),ly);c.stroke();c.restore()}}});
+ if(t>TB(41.9)){const k=P(t,TB(41.9),TB(42.6));R(c,'= $120M + $200M',ox+2*(bw+gap)+bw/2,base-320*sc-90,26,k,{f:MO(24,600),c:C.gn,al:'center'})}}
+function dcf(c,t,a){HEAD(c,t,a,'04','TRANSACTIONS — II');
+ R(c,'Tesla Equity Valuation',160,360,72,P(t,a+.2,a+.8),{f:SF(72),ls:-1});R(c,'Discounted cash flow · May 2026',160,412,26,P(t,a+.4,a+1),{f:SI(28),c:C.gd});
+ const steps=['Historical\nperformance','Forecast\nUFCF','Discount\nat WACC','Enterprise\nvalue','Equity\nvalue','Implied\nshare price'];
+ const y0=560,bx=160,sw=270;steps.forEach((s,i)=>{const t0=a+.9+i*TB(.85);const k=P(t,t0,t0+.6);if(k<=0)return;const x=bx+i*sw;c.save();c.globalAlpha=es(k);
+  const last=i===5;c.strokeStyle=last?C.gd:C.ln;c.lineWidth=last?2:1.5;c.fillStyle=last?'rgba(200,165,90,.12)':'rgba(8,22,41,.6)';c.fillRect(x,y0,220,230);c.strokeRect(x,y0,220,230);
+  // glyphs
+  const gx=x+110,gy=y0+95;c.fillStyle=C.gd;
+  if(i==0){[30,44,40,58].forEach((h,j)=>c.fillRect(gx-60+j*32,gy+30-h,20,h))}
+  if(i==1){[34,46,58,70,82].forEach((h,j)=>{c.globalAlpha=es(k)*(.5+j*.12);c.fillRect(gx-75+j*31,gy+40-h,20,h)});c.globalAlpha=es(k)}
+  if(i==2){[82,66,52,40,30].forEach((h,j)=>c.fillRect(gx-75+j*31,gy+40-h,20,h));T(c,'÷ (1 + WACC)ⁿ',gx,gy+70,{f:MO(16,600),c:C.mu,al:'center'})}
+  if(i==3){c.fillRect(gx-40,gy-40,80,80)}
+  if(i==4){c.fillRect(gx-40,gy-40,80,56);c.globalAlpha=es(k)*.35;c.fillRect(gx-40,gy+16,80,24);c.globalAlpha=es(k);T(c,'− net debt',gx,gy+70,{f:MO(16,600),c:C.mu,al:'center'})}
+  if(i==5){T(c,'$',gx,gy+30,{f:SF(96,400),c:C.gd,al:'center'})}
+  s.split('\n').forEach((q,j)=>T(c,q,x+110,y0+180+j*28,{f:SF(24,400),al:'center'}));
+  if(i<5){const ak=P(t,t0+.3,t0+.7);c.strokeStyle=C.gd;c.lineWidth=2;c.beginPath();c.moveTo(x+228,y0+115);c.lineTo(x+228+34*ak,y0+115);c.stroke();if(ak>.9){c.beginPath();c.moveTo(x+262,y0+115);c.lineTo(x+254,y0+109);c.lineTo(x+254,y0+121);c.fill()}}
+  c.restore()});
+ R(c,'Forecast unlevered free cash flow, built WACC, derived enterprise and equity value.',160,880,26,P(t,a+3.6,a+4.2),{f:MO(22),c:C.mu})}
+function lbo(c,t,a){HEAD(c,t,a,'04','TRANSACTIONS — III');
+ R(c,'ABC Limited',160,360,72,P(t,a+.2,a+.8),{f:SF(72),ls:-1});R(c,'Leveraged buyout · case study · May 2026',160,412,26,P(t,a+.4,a+1),{f:SI(28),c:C.gd});
+ const ox=160,base=840,bw=120,gap=60;T(c,'Debt',ox,500,{f:MO(18,600),c:C.mu,ls:2,a:P(t,a+.8,a+1.2)});c.fillStyle=C.mu;c.globalAlpha=P(t,a+.8,a+1.2);c.fillRect(ox+70,487,14,14);c.fillStyle=C.gd;c.fillRect(ox+150,487,14,14);c.globalAlpha=1;T(c,'Equity',ox+172,500,{f:MO(18,600),c:C.mu,ls:2,a:P(t,a+.8,a+1.2)});
+ for(let y=0;y<6;y++){const t0=a+1+y*TB(.6);const k=P(t,t0,t0+.6);if(k<=0)continue;const d=260*(1-y*.16),e=90+y*30;const x=ox+y*(bw+gap);const kk=es(k);
+  c.fillStyle='rgba(147,160,180,.55)';c.fillRect(x,base-d*kk,bw,d*kk);c.fillStyle=C.gd;c.fillRect(x,base-d*kk-e*kk,bw,e*kk);T(c,y?'Y'+y:'Entry',x+bw/2,base+36,{f:MO(20),c:C.mu,al:'center'})}
+ RULE(c,ox,base,6*(bw+gap)-gap,P(t,a+.8,a+1.4),C.mu,1.5,.7);
+ const rx=1300;[['Acquisition financing',a+1.4],['Debt schedules',a+1.9],['Operating projections',a+2.4],['IRR & exit valuation',a+2.9],['Multiple scenarios',a+3.4]].forEach(([s,t0],i)=>{const k=P(t,t0,t0+.5);R(c,s,rx,560+i*62,32,k,{f:SF(32,400)});if(k>0){c.fillStyle=C.gd;c.globalAlpha=es(k);c.fillRect(rx-34,560+i*62-12,10,10);c.globalAlpha=1}})}
+function league(c,t,a){HEAD(c,t,a,'05','LEAGUE TABLE');
+ R(c,'National case competitions',160,350,60,P(t,a+.2,a+.8),{f:SF(60),ls:-1});
+ const y0=420,rh=56;T(c,'RANK',160,y0+10,{f:MO(16,600),c:C.mu,ls:3,a:P(t,a+.5,a+.9)});T(c,'COMPETITION',420,y0+10,{f:MO(16,600),c:C.mu,ls:3,a:P(t,a+.5,a+.9)});T(c,'HOST',1260,y0+10,{f:MO(16,600),c:C.mu,ls:3,a:P(t,a+.5,a+.9)});RULE(c,160,y0+26,1600,P(t,a+.5,a+1.1),C.ln,1);
+ LEAGUE.forEach(([rk,nm,host],i)=>{const t0=TB(62+i*1.15);const k=P(t,t0,t0+.5);if(k<=0)return;const y=y0+30+i*rh;const top=rk==='1st';
+  c.save();c.globalAlpha=es(k);c.translate((1-es(k))*-40,0);if(top){const g=P(t,t0,t0+1.4);c.fillStyle=`rgba(200,165,90,${.18-.08*g})`;c.fillRect(150,y,1620,rh-6)}
+  T(c,rk,160,y+38,{f:SF(top?32:28,top?600:400),c:top?C.gd:rk==='3rd'?C.iv:C.mu});T(c,nm,420,y+38,{f:SF(30,top?600:400)});T(c,host,1260,y+38,{f:MO(22),c:C.mu});
+  c.strokeStyle=C.ln;c.lineWidth=1;c.beginPath();c.moveTo(160,y+rh-4);c.lineTo(1760,y+rh-4);c.stroke();c.restore()})}
+function lead(c,t,a){HEAD(c,t,a,'06','LEADERSHIP');
+ R(c,'Secretary, Enactus S.P.I.T.',160,360,72,P(t,a+.2,a+.8),{f:SF(72),ls:-1});R(c,'2026 – present · cross-functional teams, partnerships, project execution',160,412,24,P(t,a+.4,a+1),{f:MO(22),c:C.mu});
+ const cx=W/2,cy=640;const nodes=[[120,'+','members',-1],[3,'','brands',-.5],[3,'','NGOs',0],[2,'','social-impact projects',.5],[4,'+','events',1]];
+ const hk=P(t,a+.8,a+1.4);c.save();c.globalAlpha=es(hk);c.fillStyle=C.gd;c.beginPath();c.arc(cx,cy-70,12,0,7);c.fill();c.restore();
+ nodes.forEach(([v,suf,lab,o],i)=>{const t0=a+1.2+i*TB(.7);const k=P(t,t0,t0+.6);if(k<=0)return;const nx=cx+o*640,ny=cy+120;c.save();c.strokeStyle=C.gd;c.lineWidth=1.5;c.globalAlpha=.8;c.beginPath();c.moveTo(cx,cy-70);c.lineTo(L(cx,nx,eio(k)),L(cy-70,ny-110,eio(k)));c.stroke();c.restore();
+  R(c,NUM(v,P(t,t0,t0+1),0,'',suf),nx,ny,110,P(t,t0+.2,t0+.6),{f:SF(110,400),c:C.gd,al:'center',ls:-2});R(c,lab,nx,ny+48,22,P(t,t0+.3,t0+.7),{f:MO(22),c:C.mu,al:'center'})})}
+function skills(c,t,a){HEAD(c,t,a,'07','CAPABILITIES');
+ const cols=[['Finance',['DCF valuation','LBO modelling','Comparable company analysis','Financial statement analysis']],['Technical',['Power BI','Basic SQL','Java','Prompt engineering']],['Leadership',['Stakeholder collaboration','Team leadership','Professional communication','Presentation development']]];
+ cols.forEach(([h,items],i)=>{const x=160+i*540,t0=a+.2+i*TB(.9);R(c,h,x,360,56,P(t,t0,t0+.6),{f:SF(56),c:i?C.iv:C.gd});RULE(c,x,392,460,P(t,t0+.2,t0+.9),C.gd,1.5);
+  items.forEach((s,j)=>{const k=P(t,t0+.4+j*.18,t0+.9+j*.18);R(c,s,x,470+j*78,30,k,{f:SF(30,400)});RULE(c,x,494+j*78,460,k,C.ln,1)})})}
+function QRD(c,x,y,sz,k){if(k<=0)return;const n=QR.length,m=sz/n;c.save();c.globalAlpha=es(k);c.fillStyle=C.iv;c.fillRect(x-14,y-14,sz+28,sz+28);c.fillStyle=C.dk;QR.forEach((r,i)=>r.forEach((v,j)=>{if(v&&hs(i*31+j)<k*1.4)c.fillRect(x+j*m,y+i*m,m+.5,m+.5)}));c.restore()}
+function close(c,t,a,b){const end=P(t,DUR-TB(3),DUR-TB(1.6));c.save();c.globalAlpha=1-eio(end);
+ R(c,'Let’s talk.',160,390,150,P(t,a,a+.8),{f:SF(150),ls:-3});
+ R(c,EMAIL,160,500,40,P(t,a+.6,a+1.2),{f:MO(36)});R(c,LI,160,570,36,P(t,a+.9,a+1.5),{f:MO(32),c:C.gd});
+ RULE(c,160,630,900,P(t,a+1.2,a+2));
+ R(c,'Open to Summer 2027 internships in investment banking,',160,700,30,P(t,a+1.5,a+2.1),{f:SF(30,400)});R(c,'equity research, consulting and corporate strategy.',160,745,30,P(t,a+1.6,a+2.2),{f:SF(30,400)});
+ QRD(c,1400,300,300,P(t,a+1.8,a+2.8));R(c,'SCAN · LINKEDIN',1550,680,18,P(t,a+2.6,a+3),{f:MO(18,600),c:C.mu,al:'center',ls:3});c.restore();
+ // closing monogram rhymes with frame 1
+ const mk=P(t,DUR-TB(2.4),DUR-TB(.6));if(mk>0){MONO(c,W/2,H/2,110,mk);T(c,'RAMESHWARI CHAUDHARY',W/2,H/2+190,{f:MO(20,600),c:C.mu,al:'center',ls:8,a:P(t,DUR-TB(1.6),DUR-TB(.8))})}}
+const FN={cover,found,range,pivot,ma,dcf,lbo,league,lead,skills,close};
+
+function scene(c,t){c.drawImage(bgc,0,0);
+ if(t<S.cover[1]+.01){const out=P(t,S.cover[1]-.45,S.cover[1]);c.save();c.globalAlpha=1-eio(out);cover(c,t);c.restore()}
+ SC.slice(1).forEach(([n])=>{if(n==='close'){const [a,b]=S.close;if(t>=a)close(c,t,a,b);return}ENV(c,t,n,FN[n])});
+ // gold hairline sweep at each cut
+ SC.slice(1).forEach(([n,a])=>{const k=P(t,TB(a)-.25,TB(a)+.35);if(k<=0||k>=1)return;c.save();c.globalAlpha=Math.sin(k*Math.PI)*.85;const x=L(-100,W+100,eio(k));const g=c.createLinearGradient(x-300,0,x,0);g.addColorStop(0,'rgba(200,165,90,0)');g.addColorStop(1,'rgba(200,165,90,.9)');c.fillStyle=g;c.fillRect(x-300,138,300,2);c.restore()});
+ CHROME(c,t);AXIS(c,t)}
+function render(t){FR=Math.round(t*FPS);scene(BX,t);X.drawImage(buf,0,0);X.globalAlpha=.03;X.drawImage(GR[FR%6],0,0,W,H);X.globalAlpha=1}
+window.__render=render;
+
+// ================= SCORE =================
+function score(ac,T0){let sd=2027;const rnd=()=>{sd=(sd*1664525+1013904223)>>>0;return sd/4294967296};
+ const NB=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate);{const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=rnd()*2-1}
+ const IR=ac.createBuffer(2,ac.sampleRate*3.2,ac.sampleRate);for(let ch=0;ch<2;ch++){const d=IR.getChannelData(ch);for(let i=0;i<d.length;i++)d[i]=(rnd()*2-1)*Math.pow(1-i/d.length,3)}
+ const comp=ac.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=3;comp.attack.value=.01;comp.release.value=.25;const master=ac.createGain();master.gain.value=.8;master.connect(comp);comp.connect(ac.destination);
+ const rev=ac.createConvolver();rev.buffer=IR;const rg=ac.createGain();rg.gain.value=.4;rev.connect(rg);rg.connect(master);
+ const mus=ac.createGain();mus.connect(master);const sfx=ac.createGain();sfx.connect(master);
+ const A=s=>T0+s,mf=m=>440*Math.pow(2,(m-69)/12);
+ function send(n,v){const g=ac.createGain();g.gain.value=v;n.connect(g);g.connect(rev)}
+ function osc(t,f,d,type,dest){const o=ac.createOscillator();o.type=type;o.frequency.setValueAtTime(f,t);const g=ac.createGain();o.connect(g);g.connect(dest);o.start(t);o.stop(t+d+.1);return {o,g}}
+ function piano(s,m,v=.1,d=2.4,dest=mus){const t=A(s);const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(3200,t);lp.frequency.exponentialRampToValueAtTime(700,t+d);const g=ac.createGain();lp.connect(g);g.connect(dest);send(g,.5);
+  [[1,1,'triangle'],[2,.35,'sine'],[3,.12,'sine'],[4.01,.06,'sine']].forEach(([r,gv,ty])=>{const o=ac.createOscillator();o.type=ty;o.frequency.value=mf(m)*r;const og=ac.createGain();og.gain.value=gv;o.connect(og);og.connect(lp);o.start(t);o.stop(t+d+.2)});
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.006);g.gain.exponentialRampToValueAtTime(v*.35,t+.4);g.gain.exponentialRampToValueAtTime(.0001,t+d)}
+ function pad(s,ms,d,v=.025){const t=A(s);const lp=ac.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;const g=ac.createGain();lp.connect(g);g.connect(mus);send(g,.8);
+  ms.forEach(m=>[-6,6].forEach(dt=>{const o=ac.createOscillator();o.type='sawtooth';o.frequency.value=mf(m);o.detune.value=dt;o.connect(lp);o.start(t);o.stop(t+d+1)}));
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+1);g.gain.setValueAtTime(v,t+d-.3);g.gain.linearRampToValueAtTime(0,t+d+.8)}
+ function sub(s,m,v=.22){const t=A(s);const {g}=osc(t,mf(m),.7,'sine',mus);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.6)}
+ function shaker(s,v=.05){const t=A(s);const src=ac.createBufferSource();src.buffer=NB;const f=ac.createBiquadFilter();f.type='highpass';f.frequency.value=6500;const g=ac.createGain();src.connect(f);f.connect(g);g.connect(mus);src.start(t,rnd());src.stop(t+.08);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.06)}
+ function tick(s,v=.05,f=2400){const t=A(s);const {g}=osc(t,f,.03,'sine',sfx);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.002);g.gain.exponentialRampToValueAtTime(.0001,t+.025)}
+ function paper(s,v=.08){const t=A(s);const src=ac.createBufferSource();src.buffer=NB;const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.setValueAtTime(1500,t);f.frequency.exponentialRampToValueAtTime(4500,t+.25);f.Q.value=.8;const g=ac.createGain();src.connect(f);f.connect(g);g.connect(sfx);send(g,.2);src.start(t,rnd());src.stop(t+.35);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.12);g.gain.exponentialRampToValueAtTime(.0001,t+.32)}
+ function bell(s,m=86,v=.09){const t=A(s);[[1,1,3.5],[2.76,.4,1.6],[5.4,.18,.8],[8.93,.08,.4]].forEach(([r,gv,d])=>{const {g}=osc(t,mf(m)*r,d,'sine',sfx);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*gv,t+.003);g.gain.exponentialRampToValueAtTime(.0001,t+d);send(g,.7)})}
+ function sweep(s,v=.05){const t=A(s);const src=ac.createBufferSource();src.buffer=NB;src.loop=true;const f=ac.createBiquadFilter();f.type='bandpass';f.Q.value=1.2;f.frequency.setValueAtTime(400,t);f.frequency.exponentialRampToValueAtTime(5000,t+.6);const g=ac.createGain();src.connect(f);f.connect(g);g.connect(sfx);send(g,.4);src.start(t,rnd());src.stop(t+.7);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.4);g.gain.exponentialRampToValueAtTime(.0001,t+.65)}
+
+ // harmony: D major, Dmaj9 – Bm9 – Gmaj9 – Asus, 4 beats each
+ const CH=[[50,[62,66,69,73,76]],[47,[62,66,69,71,73]],[43,[62,66,67,71,74]],[45,[64,67,69,71,74]]];
+ const chAt=b=>CH[Math.floor(b/4)%4];
+ // intro: sparse piano bloom
+ piano(0,74,.09,3.5);piano(TB(.5),81,.06,3);sub(0,38,.18);
+ pad(0,[50,57,62,66],TB(8),.018);
+ [[2,69],[3,73],[3.5,76],[5,74],[6,78],[7,81]].forEach(([b,m])=>piano(TB(b),m,.07,2.6));
+ // main body beats 8..88
+ for(let b=8;b<88;b+=4){const [r,ns]=chAt(b);pad(TB(b),ns.slice(0,4).map(m=>m-12),TB(4),.016);sub(TB(b),r-12,.2);sub(TB(b+2),r-12,.12);
+  piano(TB(b),ns[0],.06,2.4);piano(TB(b+.02),ns[2],.05,2.4);piano(TB(b+.04),ns[4],.045,2.4);
+  const arp=[ns[1]+12,ns[3]+12,ns[2]+12,ns[4]];[1,1.5,2.5,3].forEach((o,i)=>{if(b>=33||i%2==0)piano(TB(b+o),arp[i],.035,1.6)})}
+ for(let b=33;b<88;b+=.5)shaker(TB(b),b%1?.025:.045);
+ for(let b=60;b<73;b+=1)sub(TB(b),38-12,.1);
+ // silence beat 88-89, then resolve
+ mus.gain.setValueAtTime(1,A(TB(87.95)));mus.gain.linearRampToValueAtTime(0,A(TB(88)));mus.gain.setValueAtTime(0,A(TB(88.95)));mus.gain.linearRampToValueAtTime(1,A(TB(89)));
+ piano(TB(89),62,.1,4);piano(TB(89.02),69,.08,4);piano(TB(89.04),74,.08,4);piano(TB(89.06),78,.07,4);sub(TB(89),38,.22);pad(TB(89),[50,57,62,66,69],TB(8),.022);
+ [[91,81],[92,78],[93,76],[95.6,74]].forEach(([b,m])=>piano(TB(b),m,.06,3.2));
+ // sfx
+ bell(0,86,.05);tick(TB(1),.03);sweep(TB(2.5),.04);
+ SC.slice(1).forEach(([,a])=>{paper(TB(a)-.15,.06)});
+ for(let i=0;i<20;i++)tick(TB(8)+1.2+i*.07,.025,2600);
+ [20,21,22].forEach(b=>{for(let i=0;i<10;i++)tick(TB(b)+i*.09,.022,2200+i*40)});
+ CERTS.forEach((_,i)=>paper(TB(25)+.9+i*TB(.75),.045));
+ [37,39,41].forEach((b,i)=>{for(let j=0;j<12;j++)tick(TB(b)+j*.06,.02,1800+i*300);piano(TB(b),[74,78,81][i]+12,.04,1.4)});
+ for(let i=0;i<6;i++)tick(TB(44)+.9+i*TB(.85),.04,1500+i*120);
+ for(let i=0;i<6;i++)tick(TB(52)+1+i*TB(.6),.035,1300+i*100);
+ LEAGUE.forEach(([rk],i)=>{const s=TB(62+i*1.15);if(rk==='1st')bell(s,86,.11);else if(rk==='3rd')bell(s,81,.06);else tick(s,.04,1800)});
+ for(let i=0;i<5;i++){for(let j=0;j<8;j++)tick(TB(73)+1.2+i*TB(.7)+j*.07,.02,2000)}
+ bell(TB(89),74,.06);bell(DUR-TB(2.4),86,.06);
+ const fo=master.gain;fo.setValueAtTime(.8,A(DUR-1.5));fo.linearRampToValueAtTime(0,A(DUR+.2));
+ return master}
+
+window.__audio=async function(){const sr=48000;const oc=new OfflineAudioContext(2,Math.ceil(sr*(DUR+.4)),sr);score(oc,0);const b=await oc.startRendering();
+ const L0=b.getChannelData(0),R0=b.getChannelData(1);let pk=0;for(let i=0;i<L0.length;i++)pk=Math.max(pk,Math.abs(L0[i]),Math.abs(R0[i]));const gn=.89/pk;
+ const n=L0.length,ab=new ArrayBuffer(44+n*4),v=new DataView(ab);const ws=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+ ws(0,'RIFF');v.setUint32(4,36+n*4,true);ws(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,2,true);v.setUint32(24,sr,true);v.setUint32(28,sr*4,true);v.setUint16(32,4,true);v.setUint16(34,16,true);ws(36,'data');v.setUint32(40,n*4,true);
+ for(let i=0;i<n;i++){v.setInt16(44+i*4,cl(L0[i]*gn,-1,1)*32767,true);v.setInt16(46+i*4,cl(R0[i]*gn,-1,1)*32767,true)}
+ let s='';const u=new Uint8Array(ab);for(let i=0;i<u.length;i+=32768)s+=String.fromCharCode.apply(null,u.subarray(i,i+32768));return btoa(s)};
+
+let ac=null,t0=0,raf=0;
+function loop(){const t=ac.currentTime-t0;render(cl(t,0,DUR));if(t<DUR)raf=requestAnimationFrame(loop);else document.getElementById('again').style.display='block'}
+async function start(){cancelAnimationFrame(raf);if(ac)try{await ac.close()}catch(e){}ac=new (window.AudioContext||window.webkitAudioContext)();await ac.resume();t0=ac.currentTime+.25;score(ac,t0);document.getElementById('ui').style.display='none';document.getElementById('again').style.display='none';loop()}
+document.getElementById('play').onclick=start;document.getElementById('again').onclick=start;
+const q=new URLSearchParams(location.search);
+Promise.all(['600 40px FR','400 40px FR','italic 400 40px FR','400 40px PM','600 40px PM'].map(f=>document.fonts.load(f,'Aa'))).then(()=>{render(q.has('t')?parseFloat(q.get('t')):0);if(q.has('t'))document.getElementById('ui').style.display='none'});
+</script></body></html>

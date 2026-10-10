@@ -1,69 +1,63 @@
-# dependencies
+# ── dependencies ──────────────────────────────────────────────────────────────
 node_modules/
 .pnp
 .pnp.js
 
-# build output
+# ── build output ──────────────────────────────────────────────────────────────
 out/
 dist/
 .next/
+frames/
+resumotion.zip
 
-# env
+# ── env ───────────────────────────────────────────────────────────────────────
 .env
 .env.local
 .env.*.local
 
-# OS
+# ── OS ────────────────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# editors
+# ── editors ───────────────────────────────────────────────────────────────────
 .vscode/settings.json
 .idea/
 *.suo
-*.ntvs*
-*.njsproj
-*.sln
 *.sw?
 
-# logs
+# ── logs ──────────────────────────────────────────────────────────────────────
+*.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
-*.log
 
-# playwright
+# ── playwright ────────────────────────────────────────────────────────────────
 playwright-report/
 test-results/
 .playwright/
 
-# large binaries — never commit renders or reference videos
-# *.mp4
-# *.mov
-# *.avi
-# *.webm
-# *.wav
+# ── media — hosted on GitHub Releases, not in the repo ───────────────────────
+# Social-cut Perception is also excluded (too large even at 6 MB for a skill install)
+*.mp4
+*.mov
+*.avi
+*.webm
+*.wav
 
-# personal reference reels — all theme HTMLs contain real people's data
-examples/reference/
-themes/perception/reference.html
-themes/speedrun/reference.html
-themes/prospectus/prospectus.html
-themes/ipo/ipo.html
+# ── private documents — never commit resumes or CVs ──────────────────────────
+*.pdf
+*.doc
+*.docx
 
-# plan docs — internal, not for the public repo
-RESUMOTION_PLAN*.md
+# ── internal planning docs ────────────────────────────────────────────────────
 RESUMOTION_SKILL_PLAN.md
 
-# scratch notes
-ui.md
+# ── superseded layout (kept locally in _old/, not shipped) ───────────────────
+_old/
+/toolkit/
+/themes/
+/references/
 
-# fonts bundled at build time — commit the woff2 files but not system fonts
-assets/fonts/*.ttf
-assets/fonts/*.otf
-
-# temp
+# ── temp ──────────────────────────────────────────────────────────────────────
 *.tmp
 *.temp
-frames/
