@@ -10,14 +10,18 @@ A Claude skill. Works in Claude Code and claude.ai. No timeline software, no Aft
 
 ## Install
 
-**Windows:** [Download resumotion.zip](https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.zip) → unzip → move the `resumotion\` folder to `%USERPROFILE%\.claude\skills\`
-
-**Mac / Linux — one command:**
+**Mac / Linux:**
 ```bash
 mkdir -p ~/.claude/skills && curl -fsSL https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.tar.gz | tar -xz -C ~/.claude/skills
 ```
 
-**Claude.ai:** Download the zip → open the folder → upload `SKILL.md` to a Claude.ai Project as a Project file.
+**Windows (PowerShell):**
+```powershell
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude\skills" | Out-Null; Invoke-WebRequest https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.zip -OutFile "$env:TEMP\resumotion.zip"; Expand-Archive "$env:TEMP\resumotion.zip" "$env:USERPROFILE\.claude\skills" -Force
+```
+Or [download resumotion.zip](https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.zip), unzip it, and move the `resumotion` folder to `%USERPROFILE%\.claude\skills\`
+
+**Claude.ai:** Upload `SKILL.md` to a Claude.ai Project as a Project file. Or go to Settings → Skills and upload the zip.
 
 ---
 

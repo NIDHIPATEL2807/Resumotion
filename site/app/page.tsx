@@ -9,6 +9,11 @@ type InstallTab = "terminal" | "windows" | "claude-ai";
 
 const CURL_CMD = "mkdir -p ~/.claude/skills && curl -fsSL https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.tar.gz | tar -xz -C ~/.claude/skills";
 const ZIP_URL  = "https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.zip";
+const PS_CMD = [
+  "New-Item -ItemType Directory -Force $env:USERPROFILE\\.claude\\skills;",
+  "Invoke-WebRequest https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.zip -OutFile $env:TEMP\\resumotion.zip;",
+  "Expand-Archive $env:TEMP\\resumotion.zip $env:USERPROFILE\\.claude\\skills -Force",
+].join(" ");
 
 const INSTALL: Record<InstallTab, { label: string; steps: string[]; cmd: string; isZip?: boolean; note?: string }> = {
   "terminal": {
@@ -22,14 +27,12 @@ const INSTALL: Record<InstallTab, { label: string; steps: string[]; cmd: string;
   },
   "windows": {
     label: "Windows",
-    cmd: ZIP_URL,
-    isZip: true,
+    cmd: PS_CMD,
     steps: [
-      "Download the ZIP below and unzip it.",
-      "Move the resumotion\\ folder into %USERPROFILE%\\.claude\\skills\\",
+      "Open PowerShell and paste the command below — downloads and installs in one shot.",
+      "Or download the ZIP, unzip it, and move the resumotion\\ folder to %USERPROFILE%\\.claude\\skills\\",
       "Restart Claude Code, attach your resume, and pick a theme.",
     ],
-    note: "Create the .claude\\skills folder if it doesn't exist yet.",
   },
   "claude-ai": {
     label: "Claude.ai",
@@ -60,28 +63,28 @@ const SHOWCASE = [
     linkedin:"https://www.linkedin.com/in/nidhi-patel-424674252/",
   },
   {
-    id:"xymode",     file:"/reels/kaustubh-xy-mode-v2.mp4`,
+    id:"xymode",     file:"/reels/kaustubh-xy-mode-v2.mp4",
     name:"XY Mode",    person:"Kaustubh",   role:"ML Engineer",
     meta:"140 BPM · TECH · 60 s",
     desc:"Oscilloscope aesthetic. Pure signal.",
     linkedin:"https://www.linkedin.com/in/kaustubh-vekhande-a583712b6/",
   },
   {
-    id:"ipo",        file:"/reels/rameshwari-ipo-day.mp4`,
+    id:"ipo",        file:"/reels/rameshwari-ipo-day.mp4",
     name:"IPO Day",    person:"Rameshwari", role:"Finance Analyst",
     meta:"72 BPM · CINEMATIC · 62 s",
     desc:"Big-room gravity. Like a market opening bell.",
     linkedin:"https://www.linkedin.com/in/rameshwari28/",
   },
   {
-    id:"prospectus", file:"/reels/rameshwari-prospectus.mp4`,
+    id:"prospectus", file:"/reels/rameshwari-prospectus.mp4",
     name:"Prospectus", person:"Rameshwari", role:"Finance Analyst",
     meta:"88 BPM · INVESTOR · 55 s",
     desc:"Clean, confident, boardroom-ready.",
     linkedin:"https://www.linkedin.com/in/rameshwari28/",
   },
   {
-    id:"nptv",       file:"/reels/nidhi-patel-NPTV-reel.mp4`,
+    id:"nptv",       file:"/reels/nidhi-patel-NPTV-reel.mp4",
     name:"Signal Hijack", person:"Nidhi",   role:"Technology Developer",
     meta:"NP·TV · PIRATE BROADCAST",
     desc:"The channel gets hijacked. Every cut is a channel flip.",
