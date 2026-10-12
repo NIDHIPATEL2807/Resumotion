@@ -80,7 +80,7 @@ const SHOWCASE = [
   },
   {
     id:"xymode",     file:"/reels/kaustubh-xy-mode-v2.mp4",
-    name:"XY Mode",    person:"Kaustubh",   role:"ML Engineer",
+    name:"XY Mode",    person:"Kaustubh",   role:"Electrical Engineer",
     meta:"140 BPM · TECH · 60 s",
     desc:"Oscilloscope aesthetic. Pure signal.",
     linkedin:"https://www.linkedin.com/in/kaustubh-vekhande-a583712b6/",
