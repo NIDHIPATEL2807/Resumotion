@@ -104,7 +104,7 @@ async function main() {
     const todo = frameNums.filter(n => !existsSync(join(framesDir, String(n).padStart(6, '0') + '.jpg')));
     if (todo.length === 0) { console.log(`[render] chunk ${f}–${end} already done, skipping`); continue; }
 
-    const jpgs = await page.evaluate(async (frames, fps) => {
+    const jpgs = await page.evaluate(async ({ frames, fps }) => {
       const out = {};
       for (const n of frames) {
         window.__render(n / fps);
@@ -112,7 +112,7 @@ async function main() {
         out[n] = canvas.toDataURL('image/jpeg', 0.93);
       }
       return out;
-    }, todo, FPS);
+    }, { frames: todo, fps: FPS });
 
     for (const [n, dataUrl] of Object.entries(jpgs)) {
       const b64 = dataUrl.replace(/^data:image\/jpeg;base64,/, '');

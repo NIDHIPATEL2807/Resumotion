@@ -142,7 +142,7 @@ def main():
     out.write_text(shell, encoding='utf-8')
 
     size_kb = out.stat().st_size / 1024
-    print(f'[build] ✓ {out}  ({size_kb:.0f} KB)')
+    print(f'[build] OK {out}  ({size_kb:.0f} KB)')
     if size_kb > 30 * 1024:
         print(f'[build] ⚠ file is over 30 MB — fonts may be too large; run fonts.py --trim')
 

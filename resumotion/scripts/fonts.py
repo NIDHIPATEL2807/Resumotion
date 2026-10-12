@@ -23,7 +23,7 @@ Canvas note: never put two different Unicode scripts under one font-family name.
 Use --indic to get a separate Indic0/Indic1/... family name in the @font-face output.
 """
 
-import argparse, base64, re, sys, urllib.request, json
+import argparse, base64, re, sys, urllib.request, urllib.parse, json
 from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
@@ -70,12 +70,11 @@ def fetch_woff2_via_fontsource(family: str, weight: int) -> bytes | None:
 
 def fetch_woff2_via_google(family: str, weight: int) -> bytes | None:
     """Fallback: parse Google Fonts CSS2 to extract a woff2 URL."""
-    css_url = GOOGLE_CSS2.format(
-        family=urllib.parse.quote(family),
-        weights=weight
-    )
     try:
-        import urllib.parse
+        css_url = GOOGLE_CSS2.format(
+            family=urllib.parse.quote(family),
+            weights=weight
+        )
         css = fetch_url(css_url, {'User-Agent': 'Mozilla/5.0'}).decode()
         urls = re.findall(r"url\(([^)]+\.woff2)\)", css)
         if not urls:
@@ -129,5 +128,4 @@ def main():
             print(f'[fonts] Example: @font-face {{ font-family: "Indic0"; src: url("..."); }}')
 
 if __name__ == '__main__':
-    import urllib.parse  # ensure available
     main()

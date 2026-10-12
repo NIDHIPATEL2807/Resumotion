@@ -1,0 +1,65 @@
+{
+  "name": "Alex Kim",
+  "role": "product engineer turning into an AI tooling builder",
+  "tagline": null,
+  "projects": [
+    {
+      "title": "Context Compression SDK",
+      "what": "Open-source SDK that trims LLM context windows by 60% without losing retrieval accuracy",
+      "metric": "60% token reduction",
+      "tags": ["LLM", "context engineering", "open source"],
+      "confidential": false
+    },
+    {
+      "title": "Agent Memory Layer",
+      "what": "Persistent memory service for multi-turn agent sessions, used in production by 3 teams",
+      "metric": "3 teams in production",
+      "tags": ["agents", "memory", "backend"],
+      "confidential": false
+    },
+    {
+      "title": "Eval Harness",
+      "what": "Internal tool to run regression tests on prompt changes across 40 model variants",
+      "metric": "40 model variants",
+      "tags": ["evals", "testing", "LLM"],
+      "confidential": false
+    }
+  ],
+  "experience": [
+    {
+      "role": "Software Engineer",
+      "company": "Acme AI",
+      "dates": "2022 – present",
+      "what": "Built the context pipeline that routes 2M daily requests across 6 model providers",
+      "confidential": false,
+      "confidential_note": null
+    },
+    {
+      "role": "Software Engineer",
+      "company": "Stripe",
+      "dates": "2020 – 2022",
+      "what": "Worked on payments infra, migrated 3 legacy services to gRPC",
+      "confidential": false,
+      "confidential_note": null
+    }
+  ],
+  "wins": [
+    {
+      "label": "1st place",
+      "event": "LLM Hackathon SF 2024",
+      "detail": "120 teams",
+      "logo": null
+    }
+  ],
+  "stack": ["Python", "TypeScript", "LangGraph", "Pinecone", "PostgreSQL", "Kubernetes"],
+  "contact": {
+    "email": "alex@alexkim.dev",
+    "github": "github.com/alexkim",
+    "linkedin": "linkedin.com/in/alexkim",
+    "site": "alexkim.dev"
+  },
+  "brand": { "colors": [], "fonts": [] },
+  "persona_image": null,
+  "looking_for": "AI infra · context engineering · agent tooling",
+  "source_notes": "Fictional demo resume. All facts invented for testing purposes."
+}

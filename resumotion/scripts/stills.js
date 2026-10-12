@@ -130,7 +130,7 @@ function buildContactSheet(stills, outDir, slug) {
   if (stills.length === 0) return;
   const cols = 3;
   const rows = Math.ceil(stills.length / cols);
-  const tileW = 640, tileH = 360;
+  const tileW = 960, tileH = 540;
 
   // build ffmpeg filter_complex for tiling
   const inputs = stills.slice(0, cols * rows).map(s => `-i ${s.fpath}`).join(' ');

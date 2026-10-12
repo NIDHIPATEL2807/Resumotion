@@ -4,8 +4,8 @@
   "description": "Repo-level scripts: package the skill zip and validate it.",
   "private": true,
   "scripts": {
-    "package": "zip -r resumotion.zip resumotion/ && echo '✓ resumotion.zip created' && unzip -l resumotion.zip | head -6",
-    "zip-check": "unzip -l resumotion.zip | awk 'NR>3{print $4}' | grep -v '^resumotion/' | grep -v '^$' | grep -v 'files' && echo 'all entries start with resumotion/ ✓' || true",
+    "package": "powershell -Command \"Compress-Archive -Path resumotion -DestinationPath resumotion.zip -Force; Write-Host 'resumotion.zip created'\"",
+    "zip-check": "powershell -Command \"Add-Type -Assembly System.IO.Compression.FileSystem; $z=[IO.Compression.ZipFile]::OpenRead('resumotion.zip'); $bad=$z.Entries|Where-Object{$_.FullName -notmatch '^resumotion/'}; if($bad){$bad|ForEach-Object{Write-Host $_.FullName}}else{Write-Host 'all entries start with resumotion/ OK'}; $z.Dispose()\"",
     "validate": "npx skills-ref validate ./resumotion"
   },
   "engines": {
