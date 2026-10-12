@@ -397,31 +397,16 @@ export default function Home() {
 
                 {/* install block — directly under TV */}
                 <div data-reveal data-delay="200" className="space-y-3" style={{ opacity:0 }}>
-                  {/* two buttons side by side */}
-                  <div className="flex gap-3 flex-wrap">
-                    <a href={ZIP_URL} target="_blank" rel="noopener noreferrer"
-                      onClick={() => track("zip_download", { location: "hero_claude_code" })}
-                      className="flex items-center gap-2 px-5 py-3 rounded-xl font-teletext uppercase tracking-wider transition-all hover:opacity-80 flex-1"
-                      style={{ background:"var(--crimson)", color:"var(--paper)", fontSize:"15px" }}>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-                      </svg>
-                      Claude Code
-                      {downloads !== null && <span className="ml-1 opacity-70" style={{ fontSize:"11px" }}>· {downloads.toLocaleString()}</span>}
-                    </a>
-                    <a href={ZIP_URL} target="_blank" rel="noopener noreferrer"
-                      onClick={() => track("zip_download", { location: "hero_claude_ai" })}
-                      className="flex items-center gap-2 px-5 py-3 rounded-xl font-teletext uppercase tracking-wider transition-all hover:opacity-80 flex-1"
-                      style={{ background:"var(--panel)", border:"1px solid var(--line)", color:"var(--paper)", fontSize:"15px" }}>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-                      </svg>
-                      Claude.ai
-                    </a>
-                  </div>
-                  <p className="font-body text-xs px-1" style={{ color:"var(--muted)" }}>
-                    Same zip — Claude Code: move folder to ~/.claude/skills/ · Claude.ai: upload zip in Settings → Skills
-                  </p>
+                  <a href={ZIP_URL} target="_blank" rel="noopener noreferrer"
+                    onClick={() => track("zip_download", { location: "hero" })}
+                    className="flex items-center gap-2 px-5 py-3 rounded-xl font-teletext uppercase tracking-wider transition-all hover:opacity-80"
+                    style={{ background:"var(--crimson)", color:"var(--paper)", fontSize:"15px", display:"inline-flex" }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Download .zip
+                    {downloads !== null && <span className="ml-1 opacity-70" style={{ fontSize:"11px" }}>· {downloads.toLocaleString()}</span>}
+                  </a>
 
                   {/* download + socials */}
                   <div className="flex items-center gap-3 flex-wrap">
