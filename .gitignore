@@ -12,7 +12,6 @@ resumotion.zip
 resumotion.tar.gz
 
 # site video assets — too large for git
-site/public/reels/
 
 # ── env ───────────────────────────────────────────────────────────────────────
 .env

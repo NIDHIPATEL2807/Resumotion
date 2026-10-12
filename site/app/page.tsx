@@ -44,46 +44,44 @@ const INSTALL: Record<InstallTab, { label: string; steps: string[]; cmd: string;
   },
 };
 
-const GH = "https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download";
-
 const SHOWCASE = [
   {
-    id:"speedrun",   file:`${GH}/ninosauraus-speedrun.mp4`,
+    id:"speedrun",   file:"/reels/ninosauraus-speedrun.mp4",
     name:"Speedrun",   person:"Nidhi",      role:"CS Student",
     meta:"120 BPM · ACTION · 58 s",
     desc:"Zero-to-hero energy. Fast cuts, pure momentum.",
     linkedin:"https://www.linkedin.com/in/nidhi-patel-424674252/",
   },
   {
-    id:"perception", file:`${GH}/nidhi-patel-perception-social.mp4`,
+    id:"perception", file:"/reels/nidhi-patel-perception-social.mp4",
     name:"Perception", person:"Nidhi",      role:"Technology Developer",
     meta:"96 BPM · EDITORIAL · 57 s",
     desc:"Slow-burn visual essay. Measured.",
     linkedin:"https://www.linkedin.com/in/nidhi-patel-424674252/",
   },
   {
-    id:"xymode",     file:`${GH}/kaustubh-xy-mode-v2.mp4`,
+    id:"xymode",     file:"/reels/kaustubh-xy-mode-v2.mp4`,
     name:"XY Mode",    person:"Kaustubh",   role:"ML Engineer",
     meta:"140 BPM · TECH · 60 s",
     desc:"Oscilloscope aesthetic. Pure signal.",
     linkedin:"https://www.linkedin.com/in/kaustubh-vekhande-a583712b6/",
   },
   {
-    id:"ipo",        file:`${GH}/rameshwari-ipo-day.mp4`,
+    id:"ipo",        file:"/reels/rameshwari-ipo-day.mp4`,
     name:"IPO Day",    person:"Rameshwari", role:"Finance Analyst",
     meta:"72 BPM · CINEMATIC · 62 s",
     desc:"Big-room gravity. Like a market opening bell.",
     linkedin:"https://www.linkedin.com/in/rameshwari28/",
   },
   {
-    id:"prospectus", file:`${GH}/rameshwari-prospectus.mp4`,
+    id:"prospectus", file:"/reels/rameshwari-prospectus.mp4`,
     name:"Prospectus", person:"Rameshwari", role:"Finance Analyst",
     meta:"88 BPM · INVESTOR · 55 s",
     desc:"Clean, confident, boardroom-ready.",
     linkedin:"https://www.linkedin.com/in/rameshwari28/",
   },
   {
-    id:"nptv",       file:`${GH}/nidhi-patel-NPTV-reel.mp4`,
+    id:"nptv",       file:"/reels/nidhi-patel-NPTV-reel.mp4`,
     name:"Signal Hijack", person:"Nidhi",   role:"Technology Developer",
     meta:"NP·TV · PIRATE BROADCAST",
     desc:"The channel gets hijacked. Every cut is a channel flip.",
@@ -192,7 +190,7 @@ function CRTHero() {
       <div className="crt-frame scanlines" style={{ aspectRatio:"16/10", background:"var(--ink)" }}>
         <video
           ref={ref}
-          src={`${GH}/nidhi-patel-NPTV-reel.mp4`}
+          src="/reels/nidhi-patel-NPTV-reel.mp4"
           autoPlay loop playsInline muted={muted}
           className="w-full h-full object-cover"
           style={{ cursor:"pointer" }}
