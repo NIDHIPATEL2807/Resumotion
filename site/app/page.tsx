@@ -408,24 +408,8 @@ export default function Home() {
                     {downloads !== null && <span className="ml-1 opacity-70" style={{ fontSize:"11px" }}>· {downloads.toLocaleString()}</span>}
                   </a>
 
-                  {/* download + socials */}
+                  {/* socials */}
                   <div className="flex items-center gap-3 flex-wrap">
-                    <a href={ZIP_URL} target="_blank" rel="noopener noreferrer"
-                      onClick={() => track("zip_download", { location: "hero" })}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg font-teletext uppercase tracking-wider transition-all hover:opacity-80"
-                      style={{ background:"var(--panel-2)", border:"1px solid var(--line)", color:"var(--paper)", fontSize:"14px" }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-                      </svg>
-                      Download .zip
-                      {downloads !== null && (
-                        <span className="font-teletext ml-1" style={{ color:"var(--crimson)", fontSize:"12px" }}>
-                          {downloads.toLocaleString()}
-                        </span>
-                      )}
-                    </a>
-
-                    <span style={{ color:"var(--line)" }}>·</span>
 
                     {/* tag me label */}
                     <span className="font-body text-xs" style={{ color:"var(--muted)" }}>tag me:</span>
