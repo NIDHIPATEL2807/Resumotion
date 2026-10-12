@@ -1,6 +1,6 @@
 ---
 name: resumotion
-description: Turn a resume, CV, portfolio or LinkedIn text into an original, beat-synced motion-graphics video reel with synthesized music — a concept invented for that person, not a template. Use when someone wants a video resume, portfolio reel, showreel, intro video, "make my resume move", or an animated version of their career, even if they don't say "video".
+description: Turn a resume, CV or LinkedIn profile into an original, beat-synced motion-graphics video reel with synthesized music. Use for video resumes, portfolio reels, showreels or intro videos.
 ---
 
 # resumotion°
