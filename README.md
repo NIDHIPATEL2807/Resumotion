@@ -6,9 +6,6 @@ A Claude skill. Works in Claude Code and claude.ai. No timeline software, no Aft
 
 → **[resumotion.vercel.app](https://resumotion.vercel.app)** · built by [Nidhi Patel](https://nidhipatel28.vercel.app) · [@Ninosauraus](https://x.com/Ninosauraus)
 
-![Downloads](https://img.shields.io/github/downloads/NIDHIPATEL2807/Resumotion/total?style=flat&label=installs&color=C4294A)
-![Latest release](https://img.shields.io/github/v/release/NIDHIPATEL2807/Resumotion?style=flat&color=C4294A)
-![License](https://img.shields.io/github/license/NIDHIPATEL2807/Resumotion?style=flat&color=C4294A)
 
 ---
 
