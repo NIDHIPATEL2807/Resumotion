@@ -21,32 +21,18 @@ function useDownloadCount() {
 /* ── data ────────────────────────────────────────────────── */
 const BAR_COLORS = ["#C0C0C0","#C0C000","#00C0C0","#00C000","#C000C0","#C00000","#0000C0"];
 
-type InstallTab = "terminal" | "windows" | "claude-ai";
+type InstallTab = "claude-code" | "claude-ai";
 
-const CURL_CMD = "mkdir -p ~/.claude/skills && curl -fsSL https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.tar.gz | tar -xz -C ~/.claude/skills";
-const ZIP_URL  = "https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.zip";
-const PS_CMD = [
-  "New-Item -ItemType Directory -Force $env:USERPROFILE\\.claude\\skills;",
-  "Invoke-WebRequest https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.zip -OutFile $env:TEMP\\resumotion.zip;",
-  "Expand-Archive $env:TEMP\\resumotion.zip $env:USERPROFILE\\.claude\\skills -Force",
-].join(" ");
+const ZIP_URL = "https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.zip";
 
 const INSTALL: Record<InstallTab, { label: string; steps: string[]; cmd: string; isZip?: boolean; note?: string }> = {
-  "terminal": {
-    label: "Mac / Linux",
-    cmd: CURL_CMD,
+  "claude-code": {
+    label: "Claude Code",
+    cmd: ZIP_URL,
+    isZip: true,
     steps: [
-      "Open Terminal (Mac: ⌘ Space → type Terminal).",
-      "Paste the command below and press Return — installs in one shot.",
-      "Attach your resume in Claude Code and pick a theme.",
-    ],
-  },
-  "windows": {
-    label: "Windows",
-    cmd: PS_CMD,
-    steps: [
-      "Open PowerShell and paste the command below — downloads and installs in one shot.",
-      "Or download the ZIP, unzip it, and move the resumotion\\ folder to %USERPROFILE%\\.claude\\skills\\",
+      "Download the ZIP and unzip it — you get a resumotion/ folder.",
+      "Move that folder into ~/.claude/skills/ (Mac/Linux) or %USERPROFILE%\\.claude\\skills\\ (Windows).",
       "Restart Claude Code, attach your resume, and pick a theme.",
     ],
   },
@@ -55,11 +41,11 @@ const INSTALL: Record<InstallTab, { label: string; steps: string[]; cmd: string;
     cmd: ZIP_URL,
     isZip: true,
     steps: [
-      "Download the ZIP and unzip it — open the resumotion/ folder.",
-      "In Claude.ai, create a new Project and upload SKILL.md as a Project file.",
-      "In that project: attach your resume and ask resumotion to pick a theme.",
+      "Download the ZIP below.",
+      "Go to Claude.ai → Settings → Skills → Upload a skill.",
+      "Upload the zip — done. Attach your resume and pick a theme.",
     ],
-    note: "Claude.ai Projects keep the file across the whole conversation.",
+    note: "No unzipping needed for Claude.ai — upload the zip directly.",
   },
 };
 
@@ -411,19 +397,31 @@ export default function Home() {
 
                 {/* install block — directly under TV */}
                 <div data-reveal data-delay="200" className="space-y-3" style={{ opacity:0 }}>
-                  {/* one-liner install */}
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 px-4 py-3 rounded-xl"
-                      style={{ background:"var(--panel)", border:"1px solid var(--line)" }}>
-                      <code className="font-teletext flex-1 truncate" style={{ color:"var(--paper)", fontSize:"13px" }}>
-                        {CURL_CMD}
-                      </code>
-                      <CopyButton text={CURL_CMD} />
-                    </div>
-                    <p className="font-body text-xs px-1" style={{ color:"var(--muted)" }}>
-                      Mac / Linux · paste in Terminal. Windows or Claude.ai? See Subscribe below.
-                    </p>
+                  {/* two buttons side by side */}
+                  <div className="flex gap-3 flex-wrap">
+                    <a href={ZIP_URL} target="_blank" rel="noopener noreferrer"
+                      onClick={() => track("zip_download", { location: "hero_claude_code" })}
+                      className="flex items-center gap-2 px-5 py-3 rounded-xl font-teletext uppercase tracking-wider transition-all hover:opacity-80 flex-1"
+                      style={{ background:"var(--crimson)", color:"var(--paper)", fontSize:"15px" }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                      </svg>
+                      Claude Code
+                      {downloads !== null && <span className="ml-1 opacity-70" style={{ fontSize:"11px" }}>· {downloads.toLocaleString()}</span>}
+                    </a>
+                    <a href={ZIP_URL} target="_blank" rel="noopener noreferrer"
+                      onClick={() => track("zip_download", { location: "hero_claude_ai" })}
+                      className="flex items-center gap-2 px-5 py-3 rounded-xl font-teletext uppercase tracking-wider transition-all hover:opacity-80 flex-1"
+                      style={{ background:"var(--panel)", border:"1px solid var(--line)", color:"var(--paper)", fontSize:"15px" }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                      </svg>
+                      Claude.ai
+                    </a>
                   </div>
+                  <p className="font-body text-xs px-1" style={{ color:"var(--muted)" }}>
+                    Same zip — Claude Code: move folder to ~/.claude/skills/ · Claude.ai: upload zip in Settings → Skills
+                  </p>
 
                   {/* download + socials */}
                   <div className="flex items-center gap-3 flex-wrap">
@@ -543,9 +541,9 @@ export default function Home() {
             </div>
 
             <div data-reveal data-delay="80" className="grid md:grid-cols-3 gap-5" style={{ opacity:0 }}>
-              {(["terminal","windows","claude-ai"] as InstallTab[]).map(tab => {
+              {(["claude-code","claude-ai"] as InstallTab[]).map(tab => {
                 const it = INSTALL[tab];
-                const isTerminal = tab === "terminal";
+                const isTerminal = tab === "claude-code";
                 return (
                   <div key={tab} className="rounded-xl overflow-hidden"
                     style={{ border: isTerminal ? "1px solid var(--crimson)" : "1px solid var(--line)", background:"var(--panel)" }}>

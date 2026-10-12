@@ -14,18 +14,16 @@ A Claude skill. Works in Claude Code and claude.ai. No timeline software, no Aft
 
 ## Install
 
-**Mac / Linux:**
-```bash
-mkdir -p ~/.claude/skills && curl -fsSL https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.tar.gz | tar -xz -C ~/.claude/skills
-```
+### Claude Code
+1. [Download resumotion.zip](https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.zip)
+2. Unzip it — you get a folder called `resumotion/`
+3. Move that folder into `~/.claude/skills/` (Mac/Linux) or `%USERPROFILE%\.claude\skills\` (Windows)
+4. Restart Claude Code
 
-**Windows (PowerShell):**
-```powershell
-New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude\skills" | Out-Null; Invoke-WebRequest https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.zip -OutFile "$env:TEMP\resumotion.zip"; Expand-Archive "$env:TEMP\resumotion.zip" "$env:USERPROFILE\.claude\skills" -Force
-```
-Or [download resumotion.zip](https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.zip), unzip it, and move the `resumotion` folder to `%USERPROFILE%\.claude\skills\`
-
-**Claude.ai:** Upload `SKILL.md` to a Claude.ai Project as a Project file. Or go to Settings → Skills and upload the zip.
+### Claude.ai
+1. [Download resumotion.zip](https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.zip)
+2. Go to **Claude.ai → Settings → Skills → Upload a skill**
+3. Upload the zip directly — done
 
 ---
 
