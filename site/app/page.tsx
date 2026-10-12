@@ -1,6 +1,22 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { track } from "@vercel/analytics";
+
+/* ── fetch total zip+tar.gz downloads from GitHub releases ── */
+function useDownloadCount() {
+  const [count, setCount] = useState<number | null>(null);
+  useEffect(() => {
+    fetch("https://api.github.com/repos/NIDHIPATEL2807/Resumotion/releases")
+      .then(r => r.json())
+      .then((releases: Array<{ assets: Array<{ download_count: number }> }>) => {
+        const total = releases.flatMap(r => r.assets).reduce((s, a) => s + a.download_count, 0);
+        setCount(total);
+      })
+      .catch(() => {});
+  }, []);
+  return count;
+}
 
 /* ── data ────────────────────────────────────────────────── */
 const BAR_COLORS = ["#C0C0C0","#C0C000","#00C0C0","#00C000","#C000C0","#C00000","#0000C0"];
@@ -325,6 +341,7 @@ function ShowcaseCard({ reel, delay }: { reel: typeof SHOWCASE[number]; delay: n
 /* ── Page ────────────────────────────────────────────────── */
 export default function Home() {
   const playheadRef = useRef<HTMLDivElement>(null);
+  const downloads = useDownloadCount();
 
   useEffect(() => {
     const el = playheadRef.current;
@@ -410,14 +427,19 @@ export default function Home() {
 
                   {/* download + socials */}
                   <div className="flex items-center gap-3 flex-wrap">
-                    <a href="https://github.com/NIDHIPATEL2807/Resumotion/releases/latest/download/resumotion.zip"
-                      target="_blank" rel="noopener noreferrer"
+                    <a href={ZIP_URL} target="_blank" rel="noopener noreferrer"
+                      onClick={() => track("zip_download", { location: "hero" })}
                       className="flex items-center gap-1.5 px-4 py-2 rounded-lg font-teletext uppercase tracking-wider transition-all hover:opacity-80"
                       style={{ background:"var(--panel-2)", border:"1px solid var(--line)", color:"var(--paper)", fontSize:"14px" }}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
                       </svg>
                       Download .zip
+                      {downloads !== null && (
+                        <span className="font-teletext ml-1" style={{ color:"var(--crimson)", fontSize:"12px" }}>
+                          {downloads.toLocaleString()}
+                        </span>
+                      )}
                     </a>
 
                     <span style={{ color:"var(--line)" }}>·</span>
@@ -532,7 +554,7 @@ export default function Home() {
                       {isTerminal && <span className="font-teletext px-2 py-0.5 rounded" style={{ color:"var(--crimson)", fontSize:"12px", border:"1px solid var(--crimson)" }}>RECOMMENDED</span>}
                     </div>
                     <div className="p-5">
-                      <InstallSteps steps={it.steps} cmd={it.cmd} isZip={!!it.isZip} />
+                      <InstallSteps steps={it.steps} cmd={it.cmd} isZip={!!it.isZip} downloads={downloads} />
                       {it.note && <p className="font-body text-xs mt-3 leading-relaxed" style={{ color:"var(--muted)" }}>{it.note}</p>}
                     </div>
                   </div>
@@ -735,7 +757,7 @@ export default function Home() {
 }
 
 /* ── InstallSteps (used in subscribe section cards) ────── */
-function InstallSteps({ steps, cmd, isZip }: { steps: string[]; cmd: string; isZip: boolean }) {
+function InstallSteps({ steps, cmd, isZip, downloads }: { steps: string[]; cmd: string; isZip: boolean; downloads?: number | null }) {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
     try { await navigator.clipboard.writeText(cmd); setCopied(true); setTimeout(()=>setCopied(false),2000); } catch {}
@@ -762,9 +784,15 @@ function InstallSteps({ steps, cmd, isZip }: { steps: string[]; cmd: string; isZ
         </div>
       ) : (
         <a href={cmd} target="_blank" rel="noopener noreferrer"
+          onClick={() => track("zip_download", { location: "subscribe" })}
           className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg font-teletext uppercase hover:opacity-90 transition-opacity"
           style={{ background:"var(--crimson)", color:"var(--paper)", fontSize:"16px" }}>
           Download ZIP
+          {downloads != null && (
+            <span className="font-teletext ml-1 opacity-80" style={{ fontSize:"13px" }}>
+              · {downloads.toLocaleString()} installs
+            </span>
+          )}
         </a>
       )}
     </div>
