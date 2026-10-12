@@ -9,6 +9,10 @@ dist/
 .next/
 frames/
 resumotion.zip
+resumotion.tar.gz
+
+# site video assets — too large for git
+site/public/reels/
 
 # ── env ───────────────────────────────────────────────────────────────────────
 .env
@@ -61,3 +65,4 @@ _old/
 # ── temp ──────────────────────────────────────────────────────────────────────
 *.tmp
 *.temp
+package-lock.json

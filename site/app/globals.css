@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+:root {
+  --bg:         #120609;
+  --surface:    #1C0B10;
+  --surface-2:  #2A1018;
+  --line:       #3D1820;
+  --ink:        #F0E6E8;
+  --muted:      #7A5560;
+  --accent:     #C4294A;
+  --accent-lo:  #8B1A2F;
+  --accent-hi:  #E83A5F;
+  --accent-ink: #F0E6E8;
+  --ok:         #3DDC84;
+}
+
+@theme inline {
+  --color-bg:         var(--bg);
+  --color-surface:    var(--surface);
+  --color-surface-2:  var(--surface-2);
+  --color-line:       var(--line);
+  --color-ink:        var(--ink);
+  --color-muted:      var(--muted);
+  --color-accent:     var(--accent);
+  --color-accent-hi:  var(--accent-hi);
+  --color-ok:         var(--ok);
+  --font-sans:        var(--font-bricolage);
+  --font-mono:        var(--font-jbmono);
+  --font-serif:       var(--font-instrument);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-bricolage), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Subtle noise */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+  opacity: 0.022;
+  mix-blend-mode: overlay;
+}
+
+/* Playhead */
+#playhead {
+  position: fixed; left: 0; top: 0; width: 2px;
+  height: 0%; background: var(--accent); z-index: 1000;
+  box-shadow: 0 0 10px var(--accent), 0 0 24px var(--accent-lo);
+  transition: height 0.04s linear;
+}
+
+/* Reveal */
+@keyframes rise {
+  from { transform: translateY(28px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.reveal { animation: rise 0.65s cubic-bezier(0.16,1,0.3,1) both; }
+
+/* Scan line sweep */
+@keyframes scan {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(400%); }
+}
+.scan-line {
+  position: absolute; top: 0; bottom: 0; width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(196,41,74,0.35), transparent);
+  animation: scan 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Glow pulse on accent elements */
+@keyframes glow-pulse {
+  0%,100% { box-shadow: 0 0 16px rgba(196,41,74,0.4); }
+  50%      { box-shadow: 0 0 32px rgba(196,41,74,0.8), 0 0 64px rgba(196,41,74,0.3); }
+}
+.glow { animation: glow-pulse 2.5s ease-in-out infinite; }
+
+/* Typewriter cursor */
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.cursor { display: inline-block; width: 2px; height: 1em; background: var(--accent); vertical-align: middle; margin-left: 2px; animation: blink 1s step-end infinite; }
+
+/* Card hover brackets */
+.card-frame { position: relative; }
+.card-frame::before, .card-frame::after,
+.card-frame > .fr-b::before, .card-frame > .fr-b::after {
+  content: ''; position: absolute; width: 14px; height: 14px;
+  border-style: solid; border-color: var(--line);
+  transition: border-color 0.2s, width 0.2s, height 0.2s;
+}
+.card-frame::before  { top: -1px; left: -1px;  border-width: 2px 0 0 2px; }
+.card-frame::after   { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+.card-frame > .fr-b::before { bottom: -1px; left: -1px;  border-width: 0 0 2px 2px; }
+.card-frame > .fr-b::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+.card-frame:hover::before, .card-frame:hover::after,
+.card-frame:hover > .fr-b::before, .card-frame:hover > .fr-b::after {
+  border-color: var(--accent); width: 18px; height: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { animation: none; opacity: 1; }
+  .scan-line { animation: none; }
+  .glow { animation: none; }
+  .cursor { animation: none; }
+}
+
+::-webkit-scrollbar        { width: 3px; }
+::-webkit-scrollbar-track  { background: var(--bg); }
+::-webkit-scrollbar-thumb  { background: var(--accent-lo); border-radius: 2px; }

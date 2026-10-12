@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>resumotion° — Render Farm preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Bricolage+Grotesque:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:     #0D0D0D;
+    --panel:  #111111;
+    --border: #1F1F1F;
+    --ink:    #E8E8E8;
+    --muted:  #555;
+    --green:  #00E676;
+    --green-d:#00B85C;
+    --dim:    rgba(0,230,118,0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--ink); font-family: 'JetBrains Mono', monospace; min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 52px;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--bg); z-index: 50;
+  }
+  .logo { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: -0.02em; }
+  .logo span { color: var(--green); }
+  .nav-r { display: flex; gap: 24px; font-size: 11px; letter-spacing: 0.15em; color: var(--muted); }
+  .nav-r a { color: inherit; text-decoration: none; transition: color .2s; }
+  .nav-r a:hover { color: var(--green); }
+
+  /* PLAYHEAD */
+  #playhead { position: fixed; left: 0; top: 0; width: 2px; background: var(--green); z-index: 200; box-shadow: 0 0 6px var(--green); height: 0%; transition: height 0.05s linear; }
+
+  /* HERO */
+  .hero { padding: 72px 48px 80px; }
+  .scene-tag { font-size: 10px; letter-spacing: 0.25em; color: var(--muted); text-transform: uppercase; margin-bottom: 32px; }
+  h1 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: clamp(52px, 9vw, 108px); line-height: 0.9; letter-spacing: -0.04em; margin-bottom: 24px; }
+  h1 em { font-style: normal; color: var(--green); }
+  .hero-sub { font-size: 13px; color: var(--muted); line-height: 1.8; margin-bottom: 56px; max-width: 480px; }
+
+  /* RENDER QUEUE */
+  .queue { max-width: 580px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: var(--panel); }
+  .q-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+    font-size: 10px; letter-spacing: 0.18em; color: var(--muted); text-transform: uppercase;
+  }
+  .live-badge { display: flex; align-items: center; gap: 6px; color: var(--green); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 1.2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+  .q-row {
+    display: grid; grid-template-columns: 1fr 140px 48px;
+    align-items: center; gap: 12px;
+    padding: 13px 16px; border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .q-row:last-of-type { border-bottom: none; }
+  .fname { color: var(--ink); }
+  .fname span { color: var(--muted); }
+  .bar-bg { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--green); border-radius: 2px; }
+  .done-row .bar-fill { background: var(--green-d); opacity: 0.5; }
+  .pct { font-size: 10px; color: var(--green); text-align: right; }
+  .done-row .pct { color: var(--muted); }
+  .queued-row .pct { color: var(--muted); }
+
+  .q-foot {
+    display: flex; justify-content: space-between;
+    padding: 10px 16px; background: var(--dim);
+    font-size: 10px; color: var(--muted); letter-spacing: 0.08em;
+  }
+  .q-foot strong { color: var(--green); }
+
+  /* SECTIONS */
+  .section { padding: 80px 48px; }
+  .scene-label {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 48px;
+    font-size: 10px; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase;
+  }
+  .scene-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* STEPS */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 40px; }
+  .step-n { font-size: 10px; letter-spacing: 0.2em; color: var(--green); margin-bottom: 14px; }
+  .step h3 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 22px; margin-bottom: 10px; color: var(--ink); }
+  .step p { font-size: 12px; line-height: 1.9; color: var(--muted); }
+
+  /* GALLERY */
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .card { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: var(--panel); transition: border-color .2s, transform .2s; }
+  .card:hover { border-color: var(--green); transform: translateY(-2px); }
+  .card-thumb { aspect-ratio: 16/9; background: var(--bg); position: relative; overflow: hidden; }
+  .card-thumb video { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; transition: opacity .3s; }
+  .card:hover .card-thumb video { opacity: 1; }
+  .card-overlay { position: absolute; top: 8px; left: 10px; font-size: 9px; letter-spacing: 0.2em; color: var(--muted); }
+  .card-body { padding: 14px 16px; }
+  .card-title { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+  .card-stat { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px; }
+  .card-stat strong { color: var(--green); }
+
+  /* CTA */
+  .cta { text-align: center; padding: 80px 48px; }
+  .cta h2 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: clamp(44px, 7vw, 88px); letter-spacing: -0.04em; line-height: 1; margin-bottom: 16px; }
+  .cta h2 em { font-style: normal; color: var(--green); }
+  .cta-sub { font-size: 11px; color: var(--muted); margin-bottom: 36px; letter-spacing: 0.1em; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 32px; border-radius: 4px; text-decoration: none;
+    background: var(--green); color: #000; font-weight: 700;
+    font-family: 'Bricolage Grotesque', sans-serif; font-size: 14px;
+    letter-spacing: 0.04em; box-shadow: 0 0 28px rgba(0,230,118,0.2);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn:hover { transform: scale(1.03); box-shadow: 0 0 40px rgba(0,230,118,0.3); }
+
+  /* FOOTER */
+  footer {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    padding: 20px 48px; border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--muted);
+  }
+  footer a { color: var(--muted); text-decoration: none; transition: color .2s; }
+  footer a:hover { color: var(--green); }
+  .footer-links { display: flex; gap: 20px; }
+</style>
+</head>
+<body>
+
+<div id="playhead"></div>
+
+<nav>
+  <div class="logo">resumotion<span>°</span></div>
+  <div class="nav-r">
+    <a href="https://github.com/NIDHIPATEL2807/Resumotion">GitHub</a>
+    <a href="https://x.com/Ninosauraus">X / Twitter</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="scene-tag">// scene_01 — introducing</div>
+  <h1>Your resume,<br><em>rendered.</em></h1>
+  <p class="hero-sub">A free Claude skill. Drop your resume, pick a theme,<br>get a 60-second reel with music. One chat.</p>
+
+  <div class="queue">
+    <div class="q-head">
+      <span>render_queue.log</span>
+      <span class="live-badge"><span class="dot"></span>RENDERING</span>
+    </div>
+
+    <div class="q-row done-row">
+      <span class="fname">kaustubh<span>.pdf</span></span>
+      <div class="bar-bg"><div class="bar-fill" style="width:100%"></div></div>
+      <span class="pct">done</span>
+    </div>
+    <div class="q-row done-row">
+      <span class="fname">rameshwari<span>.pdf</span></span>
+      <div class="bar-bg"><div class="bar-fill" style="width:100%"></div></div>
+      <span class="pct">done</span>
+    </div>
+    <div class="q-row">
+      <span class="fname">nidhi<span>.pdf</span></span>
+      <div class="bar-bg"><div class="bar-fill" id="live-bar" style="width:58%"></div></div>
+      <span class="pct" id="live-pct">58%</span>
+    </div>
+    <div class="q-row queued-row">
+      <span class="fname">your<span>.pdf</span></span>
+      <div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div>
+      <span class="pct">queued</span>
+    </div>
+
+    <div class="q-foot">
+      <span>frames: <strong id="frames">1044</strong> / 1800</span>
+      <span>eta: <strong id="eta">0:13</strong></span>
+      <span>workers: <strong>5</strong></span>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section">
+  <div class="scene-label">// scene_02 — how_it_works</div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-n">01</div>
+      <h3>Drop your resume</h3>
+      <p>Paste or attach in any Claude chat. No form, no upload portal.</p>
+    </div>
+    <div class="step">
+      <div class="step-n">02</div>
+      <h3>Choose a theme</h3>
+      <p>Speedrun, IPO Day, Perception — each is a full audio-visual identity.</p>
+    </div>
+    <div class="step">
+      <div class="step-n">03</div>
+      <h3>Reel exported</h3>
+      <p>Claude renders frame-by-frame: type, colour, music. One message.</p>
+    </div>
+  </div>
+</div>
+
+<!-- GALLERY -->
+<div class="section">
+  <div class="scene-label">// scene_03 — the_reels</div>
+  <div class="gallery-grid">
+    <div class="card">
+      <div class="card-thumb">
+        <video src="/reels/ninosauraus-speedrun.mp4" muted loop preload="metadata"
+          onmouseenter="this.play()" onmouseleave="this.pause(); this.currentTime=0;"></video>
+        <div class="card-overlay">SPEEDRUN</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Speedrun</div>
+        <div class="card-stat"><strong>120 BPM</strong> · ACTION · 58 s · Nino</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-thumb">
+        <video src="/reels/rameshwari-ipo-day.mp4" muted loop preload="metadata"
+          onmouseenter="this.play()" onmouseleave="this.pause(); this.currentTime=0;"></video>
+        <div class="card-overlay">IPO DAY</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">IPO Day</div>
+        <div class="card-stat"><strong>72 BPM</strong> · CINEMATIC · 62 s · Rameshwari</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-thumb">
+        <video src="/reels/kaustubh-xy-mode-v2.mp4" muted loop preload="metadata"
+          onmouseenter="this.play()" onmouseleave="this.pause(); this.currentTime=0;"></video>
+        <div class="card-overlay">XY MODE</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">XY Mode</div>
+        <div class="card-stat"><strong>140 BPM</strong> · TECH · 60 s · Kaustubh</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-thumb">
+        <video src="/reels/rameshwari-prospectus.mp4" muted loop preload="metadata"
+          onmouseenter="this.play()" onmouseleave="this.pause(); this.currentTime=0;"></video>
+        <div class="card-overlay">PROSPECTUS</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Prospectus</div>
+        <div class="card-stat"><strong>88 BPM</strong> · INVESTOR · 55 s · Rameshwari</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-thumb">
+        <video src="/reels/nidhi-patel-perception.mp4" muted loop preload="metadata"
+          onmouseenter="this.play()" onmouseleave="this.pause(); this.currentTime=0;"></video>
+        <div class="card-overlay">PERCEPTION</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Perception</div>
+        <div class="card-stat"><strong>96 BPM</strong> · EDITORIAL · 57 s · Nidhi</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta">
+  <h2>One chat.<br><em>Your reel.</em></h2>
+  <p class="cta-sub">// free · open source · no login</p>
+  <a href="https://claude.ai" class="btn">Open in Claude.ai →</a>
+</div>
+
+<footer>
+  <span>resumotion<span style="color:var(--green)">°</span> — built by <a href="https://nidhipatel28.vercel.app/">Nidhi Patel</a></span>
+  <div class="footer-links">
+    <a href="https://github.com/NIDHIPATEL2807/Resumotion">GitHub</a>
+    <a href="https://x.com/Ninosauraus">Twitter / X</a>
+  </div>
+</footer>
+
+<script>
+  // playhead
+  window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight) * 100;
+    document.getElementById('playhead').style.height = pct + '%';
+  }, { passive: true });
+
+  // live render animation
+  let pct = 58, frames = 1044;
+  const bar = document.getElementById('live-bar');
+  const pctEl = document.getElementById('live-pct');
+  const framesEl = document.getElementById('frames');
+  const etaEl = document.getElementById('eta');
+
+  const tick = setInterval(() => {
+    if (pct >= 100) { clearInterval(tick); pctEl.textContent = 'done'; bar.style.background = 'var(--green-d)'; bar.style.opacity = '0.5'; return; }
+    pct = Math.min(100, pct + Math.random() * 1.8);
+    frames = Math.min(1800, Math.floor(frames + Math.random() * 28));
+    const etaSec = Math.max(0, Math.round((1800 - frames) / 60));
+    bar.style.width = pct + '%';
+    pctEl.textContent = Math.round(pct) + '%';
+    framesEl.textContent = frames;
+    etaEl.textContent = '0:' + String(etaSec).padStart(2, '0');
+  }, 280);
+</script>
+</body>
+</html>
