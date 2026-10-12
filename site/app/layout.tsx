@@ -1,42 +1,41 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { Big_Shoulders, IBM_Plex_Sans, VT323 } from "next/font/google";
 import "./globals.css";
 
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage",
+const bigShoulders = Big_Shoulders({
+  variable: "--font-display",
   subsets: ["latin"],
-  weight: ["400", "500", "700", "800"],
+  weight: ["400", "700", "800"],
   display: "swap",
 });
 
-const instrument = Instrument_Serif({
-  variable: "--font-instrument",
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-const jbmono = JetBrains_Mono({
-  variable: "--font-jbmono",
+const ibmPlex = IBM_Plex_Sans({
+  variable: "--font-body",
   subsets: ["latin"],
   weight: ["400", "500"],
   display: "swap",
 });
 
+const vt323 = VT323({
+  variable: "--font-teletext",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "resumotion°",
-  description: "A free Claude skill that turns your resume into a 60-second reel, with music, in one chat.",
+  title: "resumotion° TV",
+  description: "Your resume, as a film made for you. Not a template.",
   openGraph: {
-    title: "resumotion°",
-    description: "Turn your resume into a 60-second reel with music, in one chat.",
+    title: "resumotion° TV",
+    description: "Your resume, as a film made for you. Not a template.",
     type: "website",
   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${bricolage.variable} ${instrument.variable} ${jbmono.variable}`}>
+    <html lang="en" className={`${bigShoulders.variable} ${ibmPlex.variable} ${vt323.variable}`}>
       <body>{children}</body>
     </html>
   );
